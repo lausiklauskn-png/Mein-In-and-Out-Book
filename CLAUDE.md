@@ -83,8 +83,9 @@ bash tests/gegenprobe.sh                # Wegwerf-Kopie, jeder Fall muss seine r
 NUR_ANKER=1 bash tests/gegenprobe.sh    # nur die Anker, in Sekunden
 ```
 
-Zuletzt gemessen (2026-10-02, Ausgangstor): **82 grün · 0 ROT** · Gegenprobe
-siehe PR. Davor (Stufe 1): 49 grün · 13 gefangen.
+Zuletzt gemessen (2026-10-02, Ausgangstor): **82 grün · 0 ROT** · die 17 neuen
+Gegenprobe-Fälle **17 gefangen · 0 blind · 0 tote Anker**. Erster Lauf: 1 aus falschem Grund
+(die Probe wartete auf den Ordner, den der Fall wegnimmt, und stürzte ab), danach gefangen. Davor (Stufe 1): 49 grün · 13 gefangen.
 ⚠ Die Probe „… mit rot markierter Kopie der Stelle“ war ein Flatterer: sie las die Karte,
 bevor die markierte Kopie gezeichnet war. Sie wartet jetzt auf das Bild selbst.
 ⚠ Nicht gemessen: das Tablet, echtes Teilen aus einer Android-App, echte Post, ein echter Versand an eine KI (gestellt).
