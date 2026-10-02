@@ -94,7 +94,26 @@ fall "KANON: Modul 25 wird hier abgewandelt" modules/25_pseudonym.js \
 fall "KANON: die Anbieter-Liste wird hier abgewandelt" assets/anbieter.js \
   'claude-opus-5' 'claude-opus-4' "Kanon byte-1:1: assets/anbieter.js"
 fall "VORRAT: ausgang.js fehlt im Installations-Vorrat" sw.js \
-  '"assets/ausgang.js?v=2"' '"assets/ausgang-alt.js?v=2"' "Vorrat nennen assets/ausgang.js|liegt wirklich da"
+  '"assets/ausgang.js?v=3"' '"assets/ausgang-alt.js?v=3"' "Vorrat nennen assets/ausgang.js|liegt wirklich da"
+
+fall "GLAS: die Knöpfe werden wieder fett" assets/style.css \
+  'min-height:36px;padding:5px 13px' 'min-height:46px;padding:12px 20px' "schlank"
+fall "GLAS: der Glanzpunkt fehlt" assets/style.css \
+  'background:radial-gradient(90px 60px at var(--mx,50%) var(--my,20%),rgb(255 255 255/.55),transparent 60%),' 'background:' "Glanzpunkt"
+fall "GLAS: glas.js wird nicht geladen" index.html \
+  'src="assets/glas.js?v=3"' 'src="assets/glas-alt.js?v=3"' "glas.js steht im Vorrat|Wackeln"
+fall "GLAS: glas.js fehlt im Vorrat" sw.js \
+  '"assets/glas.js?v=3"' '"assets/glas-alt.js?v=3"' "glas.js steht im Vorrat"
+fall "GLAS: der CSS-Riegel für weniger Bewegung ist weg" assets/style.css \
+  '@media (prefers-reduced-motion:reduce){.btn,.zeile{transform:none!important;transition:none}' '@media (prefers-reduced-motion:reduce){.btn,.zeile{transition:none}' "weniger Bewegung"
+fall "GLAS: das Skript wackelt trotz weniger Bewegung" assets/glas.js \
+  '(ruhig && ruhig.matches) || ' '' "rechnet dann gar nicht"
+fall "GLAS: im Dunkeln ist der Knopf wieder hell" assets/style.css \
+  '--h1:#167676;--h2:#0f5252' '--h1:#3cb4b4;--h2:#2a9a9a' "lesbar \\(dunkel"
+fall "GLAS: im Hellen ist der Knopf zu hell" assets/style.css \
+  '--h1:#117a7a;' '--h1:#3cb4b4;' "lesbar \\(hell"
+fall "RAND: Manifest nennt eine andere Icon-Fassung" manifest.json \
+  'icons/icon-512.png?v=3' 'icons/icon-512.png?v=2' "Manifest|manifest"
 
 echo "$n Fälle · $gefangen gefangen · $blind blind · $falsch aus falschem Grund · $tot tote Anker"
 rm -rf "$(dirname "$KOPIE")"

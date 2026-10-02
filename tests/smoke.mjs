@@ -71,6 +71,17 @@ for (const p of ["assets/style.css", "assets/eingang.js", "assets/pruefer-anhang
     core.some((u) => seite.includes('"' + u + '"') && u.startsWith(p)));
 }
 
+// Glas-Knöpfe und silberner Rand (Klaus 2026-10-02)
+const vMan = [...JSON.stringify(manifest.icons).matchAll(/\?v=(\d+)/g)].map((m) => m[1]);
+ok("das Manifest nennt die Icons mit derselben ?v= wie Seite und Vorrat", vMan.length >= 3 && vMan.every((v) => v === vSeite[0]), vMan.join(","));
+ok("glas.js steht im Vorrat und wird nach ausgang.js geladen", core.includes("assets/glas.js?v=" + vSeite[0]) &&
+  seite.indexOf('src="assets/glas.js') > seite.indexOf('src="assets/ausgang.js'));
+ok("der Rand wird gebaut, nicht von Hand: Quelle ohne Rand + Werkzeug liegen da, das Icon ist nicht mehr die Quelle",
+  existsSync(join(WURZEL, "icons/quelle-512.png")) && existsSync(join(WURZEL, "tools/rand-bauen.py")) && sha("icons/quelle-512.png") !== sha("icons/icon-512.png"));
+const css = lies("assets/style.css"), glas = lies("assets/glas.js");
+ok("Glas: der Glanzpunkt folgt --mx/--my, das Wackeln --rx/--ry", /radial-gradient\([^)]*var\(--mx/.test(css) && /rotateX\(var\(--rx/.test(css) && /--ry/.test(glas));
+ok("Glas: bei „weniger Bewegung\" wackelt nichts (CSS UND Skript)", /prefers-reduced-motion:reduce\)\{\.btn,\.zeile\{transform:none/.test(css) && /prefers-reduced-motion: reduce/.test(glas));
+
 const st = manifest.share_target || {};
 ok("Teilen-Ziel: POST multipart an ./teilen, mit Dateien", st.method === "POST" && st.enctype === "multipart/form-data" &&
   st.action === "./teilen" && Array.isArray(st.params && st.params.files) && st.params.files[0].name === "dateien");
@@ -363,6 +374,63 @@ try {
   const ohne = await op.evaluate(async () => ({ m: document.getElementById("ausMeldung").textContent, c: await navigator.clipboard.readText() }));
   ok("Ausgang: fehlt Modul 25, geht nichts hinaus (auch nicht beim zweiten Tipp)", /nicht geladen/.test(ohne.m) && ohne.c === "vorher", JSON.stringify(ohne));
   await octx.close();
+
+  /* 9b · Glas-Knöpfe und silberner Rand (Klaus 2026-10-02: „Nur nicht so fette Button … Bediener-Tool") */
+  const gp = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+  await gp.goto(BASIS + "index.html");
+  await gp.waitForFunction(() => window.__glas);
+  const masse = await gp.evaluate(() => [...document.querySelectorAll("main .btn")].filter((b) => b.offsetParent).map((b) => Math.round(b.getBoundingClientRect().height)));
+  ok("Knöpfe sind schlank: höchstens 38 px hoch (vorher 44+), aber mindestens 32 px zum Treffen",
+    masse.length > 2 && masse.every((h) => h >= 32 && h <= 38), masse.join(","));
+  const glanz = await gp.evaluate(() => getComputedStyle(document.querySelector("#textPruefen"), "::before").backgroundImage);
+  ok("jeder Knopf trägt den Glanzpunkt (::before, radial)", /radial-gradient/.test(glanz), glanz.slice(0, 80));
+  const kb = await gp.$("#textPruefen"); const r = await kb.boundingBox();
+  await gp.mouse.move(r.x + r.width * 0.9, r.y + r.height * 0.2);
+  const schief = await gp.evaluate(() => { const b = document.querySelector("#textPruefen"); return { ry: b.style.getPropertyValue("--ry"), tf: getComputedStyle(b).transform }; });
+  ok("Wackeln: die Maus rechts oben kippt den Knopf (--ry > 0, transform gesetzt)", parseFloat(schief.ry) > 3 && schief.tf !== "none", JSON.stringify(schief));
+  await gp.mouse.move(5, 880);
+  const gerade = await gp.evaluate(() => document.querySelector("#textPruefen").style.getPropertyValue("--ry"));
+  ok("… und verlässt die Maus ihn, steht er wieder gerade", gerade === "", gerade);
+  const ring = await gp.evaluate(async () => {
+    const lies = (u, n) => new Promise((ja) => { const i = new Image(); i.onload = () => { const c = document.createElement("canvas"); c.width = c.height = n;
+      const x = c.getContext("2d"); x.drawImage(i, 0, 0, n, n); ja(x.getImageData(0, 0, n, n).data); }; i.onerror = () => ja(null); i.src = u; });
+    const out = {};
+    for (const [u, n] of [["icons/icon-512.png", 512], ["icons/quelle-512.png", 512], ["icons/favicon-32.png", 32], ["icons/apple-touch-icon.png", 180]]) {
+      const d = await lies(u, n); if (!d) { out[u] = null; continue; }
+      const k = Math.max(1, Math.round(n * 0.015)), m = n >> 1;
+      out[u] = [[m, k], [k, m], [m, n - 1 - k], [n - 1 - k, m]].map(([x, y]) => { const o = (y * n + x) * 4; return [d[o], d[o + 1], d[o + 2], d[o + 3]]; });
+    }
+    return out;
+  });
+  const silber = (p) => p && p[3] > 200 && Math.max(p[0], p[1], p[2]) - Math.min(p[0], p[1], p[2]) < 24 && p[0] > 70;
+  for (const u of ["icons/icon-512.png", "icons/favicon-32.png", "icons/apple-touch-icon.png"]) {
+    ok("silberner Rand ringsum (oben, links, unten, rechts): " + u, ring[u] && ring[u].every(silber), JSON.stringify(ring[u]));
+  }
+  ok("… und die Quelle selbst trägt keinen (sonst misst der Wächter nichts)", ring["icons/quelle-512.png"] && !ring["icons/quelle-512.png"].every(silber));
+  await gp.close();
+  for (const schema of ["light", "dark"]) {
+  const dctx = await browser.newContext({ colorScheme: schema });
+  const dp = await dctx.newPage(); await dp.goto(BASIS + "index.html");
+  const kontrast = await dp.evaluate(() => {
+    const b = document.querySelector("#textPruefen"), cs = getComputedStyle(b);
+    const zahl = (t) => (t.match(/rgba?\(([^)]+)\)/g) || []).map((x) => x.match(/[\d.]+/g).slice(0, 3).map(Number));
+    const L = ([r, g, bl]) => { const f = (v) => { v /= 255; return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4; }; return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(bl); };
+    const t = L(zahl(cs.color)[0]);
+    const flaechen = zahl(cs.backgroundImage);            // beide Enden des Verlaufs
+    return Math.min(...flaechen.map((f) => { const a = Math.max(t, L(f)), z = Math.min(t, L(f)); return (a + 0.05) / (z + 0.05); }));
+  });
+  ok("Schrift auf dem Hauptknopf lesbar (" + (schema === "dark" ? "dunkel" : "hell") + ", Kontrast ≥ 4,5 an beiden Enden des Verlaufs)", kontrast >= 4.5, kontrast.toFixed(2));
+  await dctx.close();
+  }
+  const rctx = await browser.newContext({ reducedMotion: "reduce" });
+  const rp = await rctx.newPage(); await rp.goto(BASIS + "index.html"); await rp.waitForFunction(() => window.__glas);
+  const rb = await (await rp.$("#textPruefen")).boundingBox();
+  await rp.mouse.move(rb.x + rb.width * 0.9, rb.y + rb.height * 0.2);
+  const ruhig = await rp.evaluate(() => getComputedStyle(document.querySelector("#textPruefen")).transform);
+  ok("bei „weniger Bewegung\" kippt kein Knopf", ruhig === "none", ruhig);
+  const ruhigVar = await rp.evaluate(() => document.querySelector("#textPruefen").style.getPropertyValue("--ry"));
+  ok("… und das Skript rechnet dann gar nicht erst (kein --ry gesetzt)", ruhigVar === "", ruhigVar);
+  await rctx.close();
 
   /* 10 · Handy */
   const h = await browser.newPage({ viewport: { width: 360, height: 740 } });
