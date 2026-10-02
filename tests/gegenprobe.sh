@@ -61,6 +61,41 @@ fall "KANON: der Prüfkern wird hier abgewandelt" assets/pruefer-anhang.js \
 fall "RECHT: Platzhalter statt echter Angaben im Impressum" impressum.html \
   '<p>Klaus Nitzsche<br>Märchenweg 14' '<p>Max Mustermann<br>Musterweg 1' "echten Angaben"
 
+fall "AUSGANG: ohne Modul 25 geht trotzdem etwas hinaus" assets/ausgang.js \
+  'if (!P) { meldung("Die Prüfung (Modul 25) ist nicht geladen. Es geht nichts hinaus."); return null; }' 'if (!P) { return { text: hinaus(m), map: {}, treffer: [] }; }' "fehlt Modul 25"
+fall "AUSGANG: der Leck-Riegel ist weg" assets/ausgang.js \
+  'if (leck) {' 'if (false) {' "steht nach dem Verdecken noch ein echter Wert"
+fall "AUSGANG: eine Anweisung an eine KI hält nicht mehr an" assets/ausgang.js \
+  'if (ki.length) {' 'if (false) {' "Anweisung an eine KI, hält der erste Tipp"
+fall "AUSGANG: der zweite Tipp geht nie weiter" assets/ausgang.js \
+  'if (weiterFuer !== schluessel) {' 'if (true) {' "zweiter Tipp geht weiter"
+fall "AUSGANG: hinaus geht der Klartext" assets/ausgang.js \
+  'return { text: r.text, map: r.map, treffer: r.findings };' 'return { text: hinaus(m), map: {}, treffer: r.findings };' "Verdeckt kopieren|nur verdeckt"
+fall "AUSGANG: „Weitere Namen\" werden nicht mit verdeckt" assets/ausgang.js \
+  '.concat(String(m.namen || "").split(/[\n,;]/))' '' "keine echte Angabe mehr"
+fall "AUSGANG: der KI-Schlüssel wird abgelegt" assets/ausgang.js \
+  'schluesselImSpeicher = sch.value.trim(); });' 'schluesselImSpeicher = sch.value.trim(); localStorage.setItem("inout_schluessel", schluesselImSpeicher); });' "Schlüssel wird nirgends abgelegt|weder in localStorage"
+fall "AUSGANG: fremde IndexedDB" assets/ausgang.js \
+  'var DB_NAME = "InOutBook1"' 'var DB_NAME = "SendePruefer1"' "eigene IndexedDB"
+fall "AUSGANG: gesendet wird an eine andere Adresse" assets/ausgang.js \
+  'fetch(a.adresse,' 'fetch(String(a.adresse).replace("api.", "proxy."),' "kein freies Adressfeld|Adresse aus der Liste"
+fall "AUSGANG: Fremdes als HTML" assets/ausgang.js \
+  'if (text != null) e.textContent = String(text);' 'if (text != null) e.innerHTML = String(text);' "kein innerHTML in ausgang"
+fall "AUSGANG: Aufdecken ohne Zuordnung" assets/ausgang.js \
+  'var t = aufdecken(ant.value, m.zuordnung);' 'var t = ant.value;' "Aufdecken setzt"
+fall "AUSGANG: die Antwort landet nicht unter KI-Antworten" assets/ausgang.js \
+  'var neu = { id: neueId(), ordner: "antwort",' 'var neu = { id: neueId(), ordner: "entwurf",' "KI-Antworten"
+fall "AUSGANG: die .eml ist kein Entwurf mehr" assets/ausgang.js \
+  '"X-Unsent: 1", ' '' "Als .eml speichern"
+fall "AUSGANG: am Handy läuft die Liste quer" assets/style.css \
+  '.zeile b,.zeile span{' '.zeile span{' "Ausgangstor mit offener Mail"
+fall "KANON: Modul 25 wird hier abgewandelt" modules/25_pseudonym.js \
+  ' * SBKIM — Modul 25 — Pseudonymisierung' ' * SBKIM: Modul 25 — Pseudonymisierung' "Kanon byte-1:1: modules/25_pseudonym.js"
+fall "KANON: die Anbieter-Liste wird hier abgewandelt" assets/anbieter.js \
+  'claude-opus-5' 'claude-opus-4' "Kanon byte-1:1: assets/anbieter.js"
+fall "VORRAT: ausgang.js fehlt im Installations-Vorrat" sw.js \
+  '"assets/ausgang.js?v=2"' '"assets/ausgang-alt.js?v=2"' "Vorrat nennen assets/ausgang.js|liegt wirklich da"
+
 echo "$n Fälle · $gefangen gefangen · $blind blind · $falsch aus falschem Grund · $tot tote Anker"
 rm -rf "$(dirname "$KOPIE")"
 [ $((blind+falsch+tot)) -eq 0 ]
