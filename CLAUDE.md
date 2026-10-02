@@ -65,6 +65,24 @@ nichts neu erfunden; der Sende-Prüfer selbst bleibt unangetastet.
   Namen“ (wie im Sende-Prüfer). Keine Anhänge im Ausgang. An eine KI geht nur der
   Mailtext samt Aufgabe.
 
+## Silberner Rand und Glas-Knöpfe (Klaus 2026-10-02)
+
+Klaus: *„eine glänzende, spiegelnde weiße Outline … also eher grau"* und *„das Design vom
+Sendeprüfer, 3D-Button und Wackel-Button"* — dann: *„Nur nicht so fette Button. Das ist ein
+Bediener-Tool."*
+
+- **Icon:** `tools/rand-bauen.py` baut alle Größen (512, 192, 96, 48, 32, apple-touch 180) aus
+  `icons/quelle-512.png` (dem Icon OHNE Rand) mit silbernem, diagonal gespiegeltem Ring und einer
+  dunklen Fuge. **Nie ein fertiges Icon als Quelle nehmen**, sonst wächst bei jedem Bauen ein Ring
+  dazu. ⚠ `maskable-512.png` bleibt ohne Ring: der Launcher schneidet es selbst zu (Grenze).
+- **Knöpfe:** Glas aus dem Sende-Prüfer (Verlauf, innere Schatten, Glanzpunkt `::before` folgt
+  `--mx/--my`), Wackeln aus family-project (`assets/glas.js`: bis 9° bei Knöpfen, 3° bei
+  Listenzeilen). **Schlank:** 32–38 px hoch. Kontrast der Schrift ≥ 4,5 hell UND dunkel
+  (gemessen an beiden Enden des Verlaufs). Bei „weniger Bewegung" wackelt nichts (CSS UND Skript).
+- Proben in `tests/smoke.mjs` (Abschnitt 9b) · Gegenprobe `NUR_FALL="GLAS:"` (8) und `RAND:` (1).
+- ⚠ Nicht gemessen: Wackeln mit dem Finger am Tablet. Der Ring ist nicht als Gegenprobe-Fall
+  sabotiert (`sed` tauscht kein Bild); von Hand gegengeprüft: die Quelle ohne Ring fällt im Wächter.
+
 ## Was leicht kaputtgeht
 
 - **Cache-Bump:** wer eine Datei aus `CORE` in `sw.js` ändert, erhöht
@@ -83,7 +101,7 @@ bash tests/gegenprobe.sh                # Wegwerf-Kopie, jeder Fall muss seine r
 NUR_ANKER=1 bash tests/gegenprobe.sh    # nur die Anker, in Sekunden
 ```
 
-Zuletzt gemessen (2026-10-02, Ausgangstor): **82 grün · 0 ROT** · die 17 neuen
+Zuletzt gemessen (2026-10-02, Glas-Knöpfe): **99 grün · 0 ROT** · `GLAS:` 8 · `RAND:` 1 · `VORRAT:` 2 gefangen, 0 blind, 0 tote Anker (erst fing der neue Kontrast-Wächter das dunkle UND das helle Grün mit 4,15 bzw. 4,45). Davor (Ausgangstor): **82 grün · 0 ROT** · die 17 neuen
 Gegenprobe-Fälle **17 gefangen · 0 blind · 0 tote Anker**. Erster Lauf: 1 aus falschem Grund
 (die Probe wartete auf den Ordner, den der Fall wegnimmt, und stürzte ab), danach gefangen. Davor (Stufe 1): 49 grün · 13 gefangen.
 ⚠ Die Probe „… mit rot markierter Kopie der Stelle“ war ein Flatterer: sie las die Karte,
