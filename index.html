@@ -7,10 +7,10 @@
 <meta name="description" content="Prüft auf deinem Gerät, was hereinkommt: Dateien, Bilder, PDFs und E-Mails auf versteckte Anweisungen an eine KI und andere Tarnungen. Nichts wird hochgeladen.">
 <meta name="theme-color" content="#0f6e6e">
 <link rel="manifest" href="manifest.json">
-<link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png?v=1">
-<link rel="icon" type="image/png" sizes="48x48" href="icons/favicon-48.png?v=1">
-<link rel="apple-touch-icon" href="icons/apple-touch-icon.png?v=1">
-<link rel="stylesheet" href="assets/style.css?v=1">
+<link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png?v=2">
+<link rel="icon" type="image/png" sizes="48x48" href="icons/favicon-48.png?v=2">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png?v=2">
+<link rel="stylesheet" href="assets/style.css?v=2">
 </head>
 <body>
 <header><div class="wrap bar">
@@ -19,6 +19,11 @@
 </div></header>
 
 <main class="wrap">
+  <div class="reihe tore" role="group" aria-label="Tor wählen">
+    <button class="btn" type="button" data-tor="eingang" aria-pressed="true">📥 Eingang</button>
+    <button class="btn leicht" type="button" data-tor="ausgang" aria-pressed="false">📤 Ausgang</button>
+  </div>
+  <div data-tor-teil="eingang">
   <h1>Eingang prüfen</h1>
   <p class="leise">Leg eine Datei ab oder füge einen Text ein. Geprüft wird hier auf deinem Gerät, nichts wird hochgeladen.
     Gesucht wird vor allem nach Anweisungen an eine KI, die jemand versteckt hat: im Text, in PDFs, in Bildern.</p>
@@ -53,6 +58,29 @@
   </details>
 
   <div id="ergebnisse" aria-live="polite"></div>
+  </div>
+
+  <div data-tor-teil="ausgang" hidden>
+  <h1>Ausgang prüfen</h1>
+  <p class="leise">Bevor ein Text an eine KI geht: Namen, Mailadressen, Telefonnummern, IBANs, Beträge, Rechnungsnummern
+    und Schlüssel werden durch Platzhalter wie ⟦NAME-1⟧ ersetzt. Die Antwort der KI deckst du hier wieder auf.
+    Die echten Angaben bleiben auf deinem Gerät.</p>
+  <div class="tor">
+    <section class="kasten" aria-labelledby="h-neu">
+      <h2 id="h-neu" style="margin-top:0">Mail einfügen oder schreiben</h2>
+      <label for="ausRoh" class="leise">Eine Mail, die du beantworten willst (Kopfzeilen Von/An/Betreff werden gelesen).</label>
+      <textarea id="ausRoh" spellcheck="false"></textarea>
+      <div class="reihe"><button class="btn" id="ausEinfuegen" type="button">📥 Einfügen</button>
+        <button class="btn leicht" id="ausEntwurf" type="button">📝 Neuer Entwurf</button></div>
+    </section>
+    <section class="kasten" aria-labelledby="h-post">
+      <h2 id="h-post" style="margin-top:0">Postfach</h2>
+      <div class="reihe" id="ausOrdner"></div>
+      <div id="ausListe" class="liste"></div>
+    </section>
+  </div>
+  <div id="ausOffen" class="offen"></div>
+  </div>
 
   <h2>Was „kein Befund" heißt</h2>
   <p class="leise">Gefunden wird, wonach dieses Werkzeug sucht. Es ist <b>kein Virenscanner</b>, und es kann umformulierte
@@ -64,11 +92,14 @@
   <p class="leise">© 2026 Klaus Nitzsche · Der Prüfkern stammt aus dem Auslieferungsprüfer.</p>
 </div></footer>
 
-<script src="assets/pruefer.js?v=1"></script>
-<script src="assets/pruefer-formate.js?v=1"></script>
-<script src="assets/pruefer-mail.js?v=1"></script>
-<script src="assets/pruefer-anhang.js?v=1"></script>
-<script src="assets/eingang.js?v=1"></script>
+<script src="assets/pruefer.js?v=2"></script>
+<script src="assets/pruefer-formate.js?v=2"></script>
+<script src="assets/pruefer-mail.js?v=2"></script>
+<script src="assets/pruefer-anhang.js?v=2"></script>
+<script src="assets/eingang.js?v=2"></script>
+<script src="modules/25_pseudonym.js?v=2"></script>
+<script src="assets/anbieter.js?v=2"></script>
+<script src="assets/ausgang.js?v=2"></script>
 <script>
 if ("serviceWorker" in navigator && location.protocol !== "file:") {
   navigator.serviceWorker.register("sw.js").catch(function () {});

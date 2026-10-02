@@ -59,3 +59,21 @@ footer{border-top:1px solid var(--rand);padding:16px 0 32px;font-size:.9rem}
 .recht h2{font-size:1.05rem}
 .recht p,.recht li{max-width:70ch}
 [hidden]{display:none!important}
+
+/* Ausgangstor (Stufe 2) */
+.tore{margin-top:1rem}
+.liste{display:grid;gap:.4rem;margin-top:.6rem}
+.zeile{display:grid;gap:.1rem;text-align:left;padding:.55rem .7rem;border:1px solid var(--linie,#ccd);border-radius:10px;background:transparent;color:inherit;font:inherit;cursor:pointer;min-width:0}
+.zeile b,.zeile span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.zeile.an{border-color:var(--akzent)}
+.offen{margin-top:1rem;display:grid;gap:.8rem;min-width:0}
+.felder{display:grid;gap:.5rem}
+.feld{display:grid;gap:.2rem}
+.feld input,.feld textarea,.offen select,.offen input[type=password]{font:inherit;padding:.45rem .6rem;border:1px solid var(--linie,#ccd);border-radius:8px;background:transparent;color:inherit;min-width:0;max-width:100%;box-sizing:border-box;width:100%}
+.offen .reihe select,.offen .reihe input[type=password]{width:auto;flex:1 1 10rem}
+.mailtext{white-space:pre-wrap;overflow-wrap:anywhere;margin:0;padding:.7rem;border-radius:8px;border:1px solid var(--linie,#ccd);font:inherit;max-width:100%;box-sizing:border-box}
+mark.fund{background:#ffe08a;color:#222;border-radius:3px}
+span.tok{background:var(--akzent);color:var(--akzent-text);border-radius:3px;padding:0 .2em}
+.meldung{margin:.4rem 0 0}
+.meldung[data-art=warn]{color:#a3460a}
+.meldung[data-art=gut]{color:var(--akzent)}

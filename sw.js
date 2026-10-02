@@ -6,13 +6,14 @@
  * Teilen aus einer anderen App: der POST an ./teilen wird hier angenommen,
  * Dateien und Text kommen in den Vorrat GETEILT, dann geht es auf
  * index.html?geteilt=1. Die Seite liest ihn und LÖSCHT ihn danach. */
-var CACHE_VERSION = "inout-v1";
+var CACHE_VERSION = "inout-v2";
 var GETEILT = "schleuse-geteilt";
 var CORE = ["./", "index.html", "impressum.html", "datenschutz.html", "manifest.json",
-  "assets/style.css?v=1", "assets/pruefer.js?v=1", "assets/pruefer-formate.js?v=1", "assets/pruefer-mail.js?v=1",
-  "assets/pruefer-anhang.js?v=1", "assets/eingang.js?v=1",
-  "icons/favicon-32.png?v=1", "icons/favicon-48.png?v=1", "icons/apple-touch-icon.png?v=1",
-  "icons/icon-192.png?v=1", "icons/icon-512.png?v=1", "icons/maskable-512.png?v=1", "icons/marke-96.png"];
+  "assets/style.css?v=2", "assets/pruefer.js?v=2", "assets/pruefer-formate.js?v=2", "assets/pruefer-mail.js?v=2",
+  "assets/pruefer-anhang.js?v=2", "assets/eingang.js?v=2",
+  "modules/25_pseudonym.js?v=2", "assets/anbieter.js?v=2", "assets/ausgang.js?v=2",
+  "icons/favicon-32.png?v=2", "icons/favicon-48.png?v=2", "icons/apple-touch-icon.png?v=2",
+  "icons/icon-192.png?v=2", "icons/icon-512.png?v=2", "icons/maskable-512.png?v=2", "icons/marke-96.png"];
 
 self.addEventListener("install", function (e) {
   e.waitUntil(caches.open(CACHE_VERSION).then(function (c) {
