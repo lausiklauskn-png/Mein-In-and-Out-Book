@@ -1,0 +1,61 @@
+/* Mein In-and-Out-Book — Gestaltung. Farben als Marken; hell und dunkel. */
+:root{--grund:#f4f6f8;--flaeche:#ffffff;--text:#16202a;--leise:#56636f;--rand:#d5dde4;
+  --akzent:#0f6e6e;--akzent-text:#ffffff;--rot:#b3261e;--rot-grund:#fdecea;--gelb:#7a5a00;--gelb-grund:#fff6d6;
+  --gruen:#1d6b35;--gruen-grund:#e6f4ea;--schatten:0 1px 3px rgba(0,0,0,.08)}
+@media (prefers-color-scheme:dark){:root{--grund:#0e1418;--flaeche:#172028;--text:#e6edf2;--leise:#9fb0bd;--rand:#2b3944;
+  --akzent:#3cb4b4;--akzent-text:#06201f;--rot:#ff8a80;--rot-grund:#3a1714;--gelb:#ffd666;--gelb-grund:#332a0b;
+  --gruen:#7fd69a;--gruen-grund:#12301c;--schatten:none}}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--grund);color:var(--text);font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+a{color:var(--akzent)}
+.wrap{max-width:960px;margin:0 auto;padding:0 16px}
+header{background:var(--flaeche);border-bottom:1px solid var(--rand)}
+.bar{display:flex;align-items:center;gap:12px;min-height:60px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px;color:var(--text);text-decoration:none;font-weight:700;font-size:1.1rem;min-width:0}
+.brand img{width:36px;height:36px;border-radius:8px;flex:0 0 auto}
+.brand small{display:block;font-weight:400;font-size:.8rem;color:var(--leise)}
+main{padding:20px 0 40px}
+h1{font-size:1.4rem;margin:0 0 6px}
+h2{font-size:1.15rem;margin:28px 0 8px}
+.leise{color:var(--leise)}
+.tor{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px}
+@media (max-width:700px){.tor{grid-template-columns:1fr}}
+.kasten{background:var(--flaeche);border:1px solid var(--rand);border-radius:12px;padding:16px;box-shadow:var(--schatten);min-width:0}
+.ablage{border:2px dashed var(--rand);border-radius:12px;padding:20px;text-align:center}
+.ablage.ueber{border-color:var(--akzent);background:color-mix(in srgb,var(--akzent) 10%,transparent)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:44px;padding:8px 16px;border-radius:10px;
+  border:1px solid var(--akzent);background:var(--akzent);color:var(--akzent-text);font:inherit;font-weight:600;cursor:pointer;text-decoration:none}
+.btn.leicht{background:transparent;color:var(--akzent)}
+.btn:focus-visible,textarea:focus-visible{outline:3px solid var(--akzent);outline-offset:2px}
+textarea{width:100%;min-height:140px;font:14px/1.4 ui-monospace,Menlo,Consolas,monospace;background:var(--grund);color:var(--text);
+  border:1px solid var(--rand);border-radius:10px;padding:10px;resize:vertical}
+.reihe{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.test{margin-top:16px;border:1px dashed var(--rand);border-radius:12px;padding:12px}
+.test summary{cursor:pointer;font-weight:600}
+#ergebnisse{display:flex;flex-direction:column;gap:14px;margin-top:20px}
+.karte{background:var(--flaeche);border:1px solid var(--rand);border-left-width:6px;border-radius:12px;padding:14px 16px;min-width:0}
+.karte[data-lage="befund"]{border-left-color:var(--rot)}
+.karte[data-lage="ungeprueft"]{border-left-color:var(--gelb)}
+.karte[data-lage="sauber"]{border-left-color:var(--gruen)}
+.karte[data-lage="laeuft"]{border-left-color:var(--rand)}
+.kopf{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
+.kopf b{overflow-wrap:anywhere}
+.marke{display:inline-block;padding:2px 10px;border-radius:999px;font-size:.85rem;font-weight:700}
+.marke.befund{background:var(--rot-grund);color:var(--rot)}
+.marke.ungeprueft{background:var(--gelb-grund);color:var(--gelb)}
+.marke.sauber{background:var(--gruen-grund);color:var(--gruen)}
+.marke.laeuft{background:var(--grund);color:var(--leise)}
+.befunde{margin:10px 0 0;padding-left:20px}
+.befunde li{margin:6px 0;overflow-wrap:anywhere}
+.befunde .stelle{display:block;font-size:.85rem;color:var(--leise)}
+.wastun{margin-top:10px;background:var(--gelb-grund);border-radius:10px;padding:10px 12px}
+.wastun ol{margin:6px 0 0;padding-left:20px}
+.hinweise{margin-top:10px;font-size:.9rem;color:var(--leise)}
+.hinweise ul{margin:6px 0 0;padding-left:20px}
+figure{margin:10px 0 0}
+figure img{max-width:100%;border-radius:8px;border:1px solid var(--rand)}
+footer{border-top:1px solid var(--rand);padding:16px 0 32px;font-size:.9rem}
+.recht h2{font-size:1.05rem}
+.recht p,.recht li{max-width:70ch}
+[hidden]{display:none!important}

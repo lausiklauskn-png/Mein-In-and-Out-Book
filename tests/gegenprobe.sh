@@ -1,0 +1,66 @@
+#!/usr/bin/env bash
+# Gegenprobe: baut Fehler ein — jeder MUSS seine eigene rote Zeile werfen.
+# Läuft in einer WEGWERF-KOPIE, nie im echten Baum.
+#   NUR_ANKER=1   nur prüfen, ob jeder Anker genau einmal trifft (Sekunden)
+#   NUR_FALL=...  nur Fälle, deren Name so beginnt
+set -u
+QUELLE="$(cd "$(dirname "$0")/.." && pwd)"
+KOPIE="$(mktemp -d)/kopie"
+mkdir -p "$KOPIE"
+( cd "$QUELLE" && tar --exclude=node_modules --exclude=.git -cf - . ) | ( cd "$KOPIE" && tar -xf - )
+ln -s "$QUELLE/node_modules" "$KOPIE/node_modules"
+gefangen=0; blind=0; falsch=0; tot=0; n=0
+
+fall() { # name datei anker ersatz muster-der-roten-zeile
+  local name="$1" datei="$2" anker="$3" ersatz="$4" muster="$5"
+  [ -n "${NUR_FALL:-}" ] && [[ "$name" != "$NUR_FALL"* ]] && return
+  n=$((n+1))
+  local zahl
+  zahl=$(ANKER="$anker" python3 -c 'import os,sys;print(open(sys.argv[1],encoding="utf-8").read().count(os.environ["ANKER"]))' "$KOPIE/$datei")
+  if [ "$zahl" != "1" ]; then tot=$((tot+1)); echo "☠ TOTER ANKER ($zahl Treffer): $name"; return; fi
+  [ -n "${NUR_ANKER:-}" ] && { echo "✓ Anker lebt: $name"; return; }
+  cp "$KOPIE/$datei" "$KOPIE/.sicher"
+  ANKER="$anker" ERSATZ="$ersatz" python3 -c 'import os,sys;p=sys.argv[1];t=open(p,encoding="utf-8").read();open(p,"w",encoding="utf-8").write(t.replace(os.environ["ANKER"],os.environ["ERSATZ"],1))' "$KOPIE/$datei"
+  local aus; aus=$(cd "$KOPIE" && node tests/smoke.mjs 2>&1)
+  cp "$KOPIE/.sicher" "$KOPIE/$datei"
+  local roteZeilen; roteZeilen=$(printf '%s\n' "$aus" | grep '^✗ ROT')
+  if [ -z "$roteZeilen" ]; then blind=$((blind+1)); echo "✗ BLIND: $name"
+  elif printf '%s\n' "$roteZeilen" | grep -qE "$muster"; then gefangen=$((gefangen+1)); echo "✓ gefangen: $name"
+  else falsch=$((falsch+1)); echo "✗ AUS FALSCHEM GRUND: $name"; printf '%s\n' "$roteZeilen" | head -3; fi
+}
+
+if [ -z "${NUR_ANKER:-}" ]; then
+  aus=$(cd "$KOPIE" && node tests/smoke.mjs 2>&1); rc=$?
+  [ $rc -ne 0 ] && { echo "Ausgangslage nicht grün (Rückgabe $rc) — Gegenprobe abgebrochen"; printf '%s\n' "$aus" | grep -v '^✓'; exit 2; }
+fi
+
+fall "EINGANG: eine Mailadresse gilt wieder als Befund" assets/eingang.js \
+  'var ANGABEN = { "PERSONENBEZUG": 1,' 'var ANGABEN = { "NICHTS": 1,' "Mailadresse macht eingehende Post NICHT rot"
+fall "EINGANG: ungeprüft wird zu sauber" assets/eingang.js \
+  ': info.ungeprueft ? "ungeprueft" : "sauber"' ': "sauber"' "unbekannte Binärdatei"
+fall "EINGANG: der Anhang trägt seine Stelle nicht mehr" assets/eingang.js \
+  'stelle: "Anhang " + a.name });' 'stelle: "" });' "Anhang wird gelesen"
+fall "EINGANG: der Dateiname wird als HTML gesetzt" assets/eingang.js \
+  'kopf.appendChild(el("b", "", name));' 'var bb = el("b"); bb.innerHTML = name; kopf.appendChild(bb);' "Markup bleibt Text|kein innerHTML"
+fall "EINGANG: kein „Was jetzt tun\" mehr" assets/eingang.js \
+  'k.appendChild(box);' '' "Was jetzt tun"
+fall "EINGANG: Verdacht-Knopf auch bei PDFs" assets/eingang.js \
+  '/^(png|jpeg|webp|gif)$/.test(A.artVon(info.bytes))' 'true' "KEINEN Knopf"
+fall "EINGANG: Ablegen per Drag & Drop geht nicht mehr" assets/eingang.js \
+  'dateienAnnehmen(e.dataTransfer.files);' '' "abgelegte Datei"
+fall "TEILEN: der Vorrat wird nach dem Lesen nicht gelöscht" assets/eingang.js \
+  'return caches.delete(GESCHEHEN);' 'return null;' "danach gelöscht|löscht den Vorrat"
+fall "TEILEN: ?geteilt=1 bleibt in der Adresse" assets/eingang.js \
+  'history.replaceState(null, "", location.pathname);' '' "geteilt=1 steht nicht mehr"
+fall "TEILEN: sw.js legt in einen anderen Vorrat" sw.js \
+  'var GETEILT = "schleuse-geteilt";' 'var GETEILT = "schleuse-anders";' "denselben Vorrat|geteilte Datei kommt an"
+fall "VORRAT: vendor/ wandert in den Installations-Vorrat" sw.js \
+  '"index.html", "impressum.html",' '"index.html", "vendor/pdfjs/pdf.min.js", "impressum.html",' "vendor/ steht NICHT"
+fall "KANON: der Prüfkern wird hier abgewandelt" assets/pruefer-anhang.js \
+  '/* Auslieferungsprüfer — Anhänge und einzelne Dateien' '/* Auslieferungsprüfer: Anhänge und einzelne Dateien' "Kanon byte-1:1: assets/pruefer-anhang.js"
+fall "RECHT: Platzhalter statt echter Angaben im Impressum" impressum.html \
+  '<p>Klaus Nitzsche<br>Märchenweg 14' '<p>Max Mustermann<br>Musterweg 1' "echten Angaben"
+
+echo "$n Fälle · $gefangen gefangen · $blind blind · $falsch aus falschem Grund · $tot tote Anker"
+rm -rf "$(dirname "$KOPIE")"
+[ $((blind+falsch+tot)) -eq 0 ]

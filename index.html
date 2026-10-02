@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mein In-and-Out-Book</title>
+<meta name="description" content="Prüft auf deinem Gerät, was hereinkommt: Dateien, Bilder, PDFs und E-Mails auf versteckte Anweisungen an eine KI und andere Tarnungen. Nichts wird hochgeladen.">
+<meta name="theme-color" content="#0f6e6e">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png?v=1">
+<link rel="icon" type="image/png" sizes="48x48" href="icons/favicon-48.png?v=1">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png?v=1">
+<link rel="stylesheet" href="assets/style.css?v=1">
+</head>
+<body>
+<header><div class="wrap bar">
+  <a class="brand" href="index.html"><img src="icons/marke-96.png" alt="" width="36" height="36">
+    <span>Mein In-and-Out-Book<small>prüft, was hereinkommt und was hinausgeht</small></span></a>
+</div></header>
+
+<main class="wrap">
+  <h1>Eingang prüfen</h1>
+  <p class="leise">Leg eine Datei ab oder füge einen Text ein. Geprüft wird hier auf deinem Gerät, nichts wird hochgeladen.
+    Gesucht wird vor allem nach Anweisungen an eine KI, die jemand versteckt hat: im Text, in PDFs, in Bildern.</p>
+
+  <div class="tor">
+    <section class="kasten" aria-labelledby="h-datei">
+      <h2 id="h-datei" style="margin-top:0">Datei</h2>
+      <div class="ablage" id="ablage" data-ablage>
+        <p style="margin-top:0">Datei hierher ziehen</p>
+        <label class="btn" for="dateiWahl">📎 Datei wählen</label>
+        <input id="dateiWahl" type="file" multiple hidden>
+        <p class="leise" style="margin-bottom:0">PDF, Foto, Word, Excel, ZIP, E-Mail (.eml), Text …
+          Am Handy geht auch: in einer anderen App <b>Teilen</b> → „Mein In-and-Out-Book" (wenn die App installiert ist).</p>
+      </div>
+    </section>
+
+    <section class="kasten" aria-labelledby="h-text">
+      <h2 id="h-text" style="margin-top:0">Text oder E-Mail</h2>
+      <label for="textFeld" class="leise">Hier einfügen, was jemand geschickt hat. Eine ganze E-Mail samt Kopfzeilen geht auch; ihre Anhänge werden dann mitgeprüft.</label>
+      <textarea id="textFeld" spellcheck="false"></textarea>
+      <div class="reihe"><button class="btn" id="textPruefen" type="button">Text prüfen</button></div>
+    </section>
+  </div>
+
+  <details class="test" data-testliste>
+    <summary>🧪 Test-Dateien zum Ausprobieren</summary>
+    <p class="leise">Erfundene Beispiele. Bei ihnen ist ein Befund das richtige Ergebnis.</p>
+    <div class="reihe">
+      <button class="btn leicht" type="button" data-test-datei="beispiele/Testbild-versteckte-Anweisung.png">Bild mit blasser Anweisung</button>
+      <button class="btn leicht" type="button" data-test-datei="beispiele/Testdatei-unsichtbarer-Text.pdf">PDF mit unsichtbarem Text</button>
+    </div>
+  </details>
+
+  <div id="ergebnisse" aria-live="polite"></div>
+
+  <h2>Was „kein Befund" heißt</h2>
+  <p class="leise">Gefunden wird, wonach dieses Werkzeug sucht. Es ist <b>kein Virenscanner</b>, und es kann umformulierte
+    Anweisungen übersehen. „Ungeprüft" heißt: ein Teil konnte nicht gelesen werden. Das ist nicht dasselbe wie „sauber".</p>
+</main>
+
+<footer><div class="wrap">
+  <a href="impressum.html">Impressum</a> · <a href="datenschutz.html">Datenschutz</a>
+  <p class="leise">© 2026 Klaus Nitzsche · Der Prüfkern stammt aus dem Auslieferungsprüfer.</p>
+</div></footer>
+
+<script src="assets/pruefer.js?v=1"></script>
+<script src="assets/pruefer-formate.js?v=1"></script>
+<script src="assets/pruefer-mail.js?v=1"></script>
+<script src="assets/pruefer-anhang.js?v=1"></script>
+<script src="assets/eingang.js?v=1"></script>
+<script>
+if ("serviceWorker" in navigator && location.protocol !== "file:") {
+  navigator.serviceWorker.register("sw.js").catch(function () {});
+}
+</script>
+</body>
+</html>
