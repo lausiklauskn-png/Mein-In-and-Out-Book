@@ -22,7 +22,7 @@ https://lausiklauskn-png.github.io/Mein-In-and-Out-Book/
 ## Stufen (Reihenfolge von Klaus)
 
 1. **Eingangstor** — gebaut (`assets/eingang.js`).
-2. **Ausgangstor** — Sende-Prüfer (Modul 25, Postfach). Nicht gebaut.
+2. **Ausgangstor** — gebaut (`assets/ausgang.js`, 2026-10-02).
 3. **Prüfbericht ganz zuletzt.** ⚠ Ohne die Wörter „Zertifikat", „sicher",
    „garantiert" — Haftung. Vor einem Verkauf schaut ein IT-Anwalt drauf.
 
@@ -43,6 +43,28 @@ https://lausiklauskn-png.github.io/Mein-In-and-Out-Book/
   `eingang.js` prüft sie und **löscht den Vorrat danach**. Der Name steht an
   zwei Stellen, die Probe hält sie gleich.
 
+## Das Ausgangstor (2026-10-02)
+
+Reiter **📤 Ausgang** (auch `index.html#ausgang`). Übernommen aus dem Sende-Prüfer,
+nichts neu erfunden; der Sende-Prüfer selbst bleibt unangetastet.
+
+- **Verdeckt wird mit Sage-Modul 25** (`modules/25_pseudonym.js`, byte-1:1 aus
+  `Sage-Protokol/src/modules/`, gepinnt in `KANON`). `ausgang.js` trägt **keine eigenen
+  Muster**. Die Anbieter-Liste `assets/anbieter.js` ist byte-1:1 aus dem Sende-Prüfer
+  (geschlossen, kein freies Adressfeld). **Dort pflegen, hier neu kopieren.**
+- Postfach: Eingefügt · Entwürfe · KI-Antworten · Exportiert; Ansicht Original ⟷
+  „Was die KI sieht“; Aufgaben zum Antippen; Kopieren · Senden · Aufdecken · .eml.
+- **Drei Riegel vor dem Hinausgehen** (`bereit()`): ohne Modul 25 geht nichts hinaus ·
+  bleibt nach dem Verdecken ein Wert stehen (`findLeak`), geht nichts hinaus · eine
+  Anweisung an eine KI im Mailtext (oder fehlende Liste) hält beim ersten Tipp an, ein
+  zweiter Tipp geht weiter.
+- **Eigene Ablage:** IndexedDB `InOutBook1` (Store `mails`), Schlüssel `inout_…` —
+  github.io ist eine geteilte Adresse. **Der KI-Schlüssel liegt nur im Speicher**, solange
+  die Seite offen ist; er wird nie abgelegt (kein Tresor wie im Sende-Prüfer — Grenze).
+- ⚠ **Grenzen:** Vornamen allein stehen nicht in Von/An; sie gehören unter „Weitere
+  Namen“ (wie im Sende-Prüfer). Keine Anhänge im Ausgang. An eine KI geht nur der
+  Mailtext samt Aufgabe.
+
 ## Was leicht kaputtgeht
 
 - **Cache-Bump:** wer eine Datei aus `CORE` in `sw.js` ändert, erhöht
@@ -61,9 +83,11 @@ bash tests/gegenprobe.sh                # Wegwerf-Kopie, jeder Fall muss seine r
 NUR_ANKER=1 bash tests/gegenprobe.sh    # nur die Anker, in Sekunden
 ```
 
-Zuletzt gemessen (2026-10-02): **49 grün · 0 ROT** · Gegenprobe **13 gefangen ·
-0 blind · 0 aus falschem Grund · 0 tote Anker**.
-⚠ Nicht gemessen: das Tablet, echtes Teilen aus einer Android-App, echte Post.
+Zuletzt gemessen (2026-10-02, Ausgangstor): **82 grün · 0 ROT** · Gegenprobe
+siehe PR. Davor (Stufe 1): 49 grün · 13 gefangen.
+⚠ Die Probe „… mit rot markierter Kopie der Stelle“ war ein Flatterer: sie las die Karte,
+bevor die markierte Kopie gezeichnet war. Sie wartet jetzt auf das Bild selbst.
+⚠ Nicht gemessen: das Tablet, echtes Teilen aus einer Android-App, echte Post, ein echter Versand an eine KI (gestellt).
 
 ## Netzweit
 
