@@ -1,0 +1,14 @@
+{
+  "name": "mein-in-and-out-book",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Mein In-and-Out-Book — prüft auf dem Gerät, was hereinkommt (Stufe 1: Eingangstor)",
+  "scripts": {
+    "test": "node tests/smoke.mjs",
+    "gegenprobe": "bash tests/gegenprobe.sh",
+    "serve": "python3 -m http.server 8000"
+  },
+  "devDependencies": {
+    "playwright-core": "1.56.1"
+  }
+}
