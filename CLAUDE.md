@@ -83,6 +83,39 @@ Bediener-Tool."*
 - ⚠ Nicht gemessen: Wackeln mit dem Finger am Tablet. Der Ring ist nicht als Gegenprobe-Fall
   sabotiert (`sed` tauscht kein Bild); von Hand gegengeprüft: die Quelle ohne Ring fällt im Wächter.
 
+## ⬇ Der Installieren-Knopf gehört IN die App (Klaus 2026-10-05)
+
+Klaus: *„Schon wieder App konnte nicht geöffnet werden … Das ist jetzt bei jeder App gewesen, die wir
+zuletzt programmiert haben. Wenn der Installationsbutton nicht in der App selber drin ist, funktioniert
+das Installieren nicht … dokumentiere das, dass wir das gleiche von der Reihe so machen."*
+
+**Regel für jede neue App: ein Installieren-Knopf in der Kopfleiste, von Anfang an.** Über das Chrome-Menü
+allein blieb am Tablet oft nur eine Verknüpfung, und beim Öffnen stand „App konnte nicht geöffnet werden".
+Im Sende-Prüfer und im Auslieferungsprüfer hat der Knopf in der App eine echte App erzeugt (2026-09-30).
+⚠ **Warum es so ist, ist nicht gemessen.** Es ist Klaus' Befund an mehreren Apps. Eine Folgerung von Chrome
+selbst gibt es nicht.
+
+`assets/installieren.js` (nach `installieren.js` + `neuladen.js` aus dem Sende-Prüfer) hängt zwei runde Knöpfe in die Kopfleiste:
+
+| Lage (`data-lage`) | was der Knopf tut |
+|---|---|
+| `angeboten` (`beforeinstallprompt` abgefangen) | Tipp öffnet den Dialog des Browsers |
+| `nicht-angeboten` | Tipp nennt den Weg: Verknüpfung mit Chrome-Zeichen entfernen, ⟳, dann Installieren |
+| `app` (display-mode standalone) | Knopf weg, keine Meldung |
+
+**⟳** wirft nur den eigenen Vorrat (`inout-*`) weg, meldet den Service-Worker ab und lädt mit `?frisch=` neu.
+`schleuse-geteilt` und IndexedDB bleiben. Dazu gehören immer: ein Manifest mit `id`, `start_url`, `scope`,
+`display: standalone` und einem maskable-Icon sowie ein Worker, der Seiten Netz-zuerst holt.
+Proben: `smoke.mjs` § 11 (drei Lagen, gestellt; 360 px) · Gegenprobe `NUR_FALL="INSTALL:"` (5 Fälle).
+Gemessen 2026-10-05: `smoke.mjs` 111 grün · 0 ROT · Gegenprobe 44 gefangen · 0 blind · 0 tote Anker.
+Cache v4, `?v=4`. ⚠ Wer die `?v=` erhöht, zieht die Anker in `tests/gegenprobe.sh` mit (`NUR_ANKER=1` meldet sie).
+⚠ Am Tablet nicht gemessen: ob die Installation über den Knopf jetzt zu einer echten App führt.
+
+## 📋 Plan: Abhakliste, Prioritäten, Bild-Metadaten (Klaus 2026-10-05)
+
+Entschieden, nicht gebaut: [`docs/BRIEF_2026-10-05_abhakliste.md`](docs/BRIEF_2026-10-05_abhakliste.md).
+Gilt für Auslieferungsprüfer, Sende-Prüfer und dieses Buch; Code dort erst nach Klaus' Freigabe je Stufe.
+
 ## Was leicht kaputtgeht
 
 - **Cache-Bump:** wer eine Datei aus `CORE` in `sw.js` ändert, erhöht

@@ -82,6 +82,14 @@ const css = lies("assets/style.css"), glas = lies("assets/glas.js");
 ok("Glas: der Glanzpunkt folgt --mx/--my, das Wackeln --rx/--ry", /radial-gradient\([^)]*var\(--mx/.test(css) && /rotateX\(var\(--rx/.test(css) && /--ry/.test(glas));
 ok("Glas: bei „weniger Bewegung\" wackelt nichts (CSS UND Skript)", /prefers-reduced-motion:reduce\)\{\.btn,\.zeile\{transform:none/.test(css) && /prefers-reduced-motion: reduce/.test(glas));
 
+// Installieren-Knopf IN der App (Klaus 2026-10-05: ohne ihn bleibt nur eine Verknüpfung)
+const inst = lies("assets/installieren.js");
+ok("installieren.js steht im Vorrat und wird geladen", core.includes("assets/installieren.js?v=" + vSeite[0]) && seite.includes('src="assets/installieren.js?v=' + vSeite[0] + '"'));
+ok("installieren.js fängt beforeinstallprompt ab und ruft prompt() erst auf Tipp", /addEventListener\("beforeinstallprompt"[\s\S]*?preventDefault\(\)/.test(inst) && /e\.prompt\(\)/.test(inst));
+ok("⟳ räumt nur den eigenen Vorrat (inout-), nicht schleuse-geteilt", /var EIGEN = \/\^inout-\//.test(inst));
+ok("Knöpfe nur über textContent, kein innerHTML", !/innerHTML|insertAdjacentHTML/.test(inst));
+ok("Manifest: id, start_url, scope, standalone, maskable-Icon", manifest.id && manifest.start_url && manifest.scope && manifest.display === "standalone" && manifest.icons.some((i) => i.purpose === "maskable"));
+
 const st = manifest.share_target || {};
 ok("Teilen-Ziel: POST multipart an ./teilen, mit Dateien", st.method === "POST" && st.enctype === "multipart/form-data" &&
   st.action === "./teilen" && Array.isArray(st.params && st.params.files) && st.params.files[0].name === "dateien");
@@ -445,6 +453,40 @@ try {
   const breit = quer2 > 0 ? await h.evaluate(() => [...document.querySelectorAll("body *")].filter((e) => e.getBoundingClientRect().right > innerWidth + 1).slice(0, 4).map((e) => e.tagName + "#" + e.id + "." + e.className).join(", ")) : "";
   ok("… auch im Ausgangstor mit offener Mail", quer2 <= 0, quer2 + " px " + breit);
   await h.close();
+  /* 11 · Installieren-Knopf, drei Lagen */
+  {
+    const ip = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+    await ip.goto(BASIS + "index.html"); await ip.waitForSelector("#installieren");
+    const lage0 = await ip.evaluate(() => [window.INOUT_INSTALL && window.INOUT_INSTALL.lage(), !document.querySelector("#installieren").hidden]);
+    ok("ohne Angebot des Browsers steht der Knopf da, Lage „nicht-angeboten\"", lage0[0] === "nicht-angeboten" && lage0[1], String(lage0));
+    await ip.click("#installieren");
+    const meld = await ip.evaluate(() => { const m = document.querySelector("#install-meldung"); return m && !m.hidden ? m.textContent : ""; });
+    ok("… ein Tipp nennt den Weg (Verknüpfung entfernen, neu laden)", /VERKNÜPFUNG/.test(meld) && /Entfernen/.test(meld), meld.slice(0, 80));
+    await ip.evaluate(() => { window.__gefragt = 0; const e = new Event("beforeinstallprompt", { cancelable: true });
+      e.prompt = () => { window.__gefragt++; }; e.userChoice = Promise.resolve({ outcome: "accepted" }); window.dispatchEvent(e); });
+    const lage1 = await ip.evaluate(() => window.INOUT_INSTALL.lage());
+    ok("bietet der Browser an, wechselt die Lage auf „angeboten\"", lage1 === "angeboten", lage1);
+    await ip.click("#installieren");
+    await ip.waitForTimeout(50);
+    const gefragt = await ip.evaluate(() => window.__gefragt);
+    ok("… und ein Tipp öffnet den Dialog des Browsers (prompt)", gefragt === 1, String(gefragt));
+    const kopf = await ip.evaluate(() => { const h = document.querySelector("header").getBoundingClientRect(); const k = document.querySelector("#neuladen").getBoundingClientRect(); return [k.width > 0, k.bottom <= h.bottom + 1]; });
+    ok("⟳ steht sichtbar in der Kopfleiste", kopf[0] && kopf[1], String(kopf));
+    await ip.close();
+    const actx2 = await browser.newContext({ viewport: { width: 1280, height: 900 } });
+    const ap2 = await actx2.newPage();
+    await ap2.addInitScript(() => { const alt = window.matchMedia.bind(window);
+      window.matchMedia = (q) => /display-mode: standalone/.test(q) ? { matches: true, media: q, addEventListener() {}, removeEventListener() {} } : alt(q); });
+    await ap2.goto(BASIS + "index.html"); await ap2.waitForSelector("#installieren", { state: "attached" });
+    const app = await ap2.evaluate(() => [window.INOUT_INSTALL.lage(), document.querySelector("#installieren").getBoundingClientRect().width]);
+    ok("läuft die Seite als App, ist der Knopf weg (keine Meldung „nichts zu tun\")", app[0] === "app" && app[1] === 0, String(app));
+    await actx2.close();
+    const hp = await browser.newPage({ viewport: { width: 360, height: 740 } });
+    await hp.goto(BASIS + "index.html"); await hp.waitForSelector("#installieren");
+    const hq = await hp.evaluate(() => [document.documentElement.scrollWidth - innerWidth, document.querySelector("#installieren").getBoundingClientRect().right <= innerWidth]);
+    ok("am Handy (360 px) passt die Kopfleiste samt Knöpfen", hq[0] <= 0 && hq[1], String(hq));
+    await hp.close();
+  }
 } catch (e) {
   ok("die Probe läuft durch (Absturz: " + String(e && e.message || e).slice(0, 200) + ")", false);
 }
