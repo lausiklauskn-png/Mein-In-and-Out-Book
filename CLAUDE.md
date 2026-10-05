@@ -134,7 +134,8 @@ bash tests/gegenprobe.sh                # Wegwerf-Kopie, jeder Fall muss seine r
 NUR_ANKER=1 bash tests/gegenprobe.sh    # nur die Anker, in Sekunden
 ```
 
-Zuletzt gemessen (2026-10-02, Glas-Knöpfe): **99 grün · 0 ROT** · `GLAS:` 8 · `RAND:` 1 · `VORRAT:` 2 gefangen, 0 blind, 0 tote Anker (erst fing der neue Kontrast-Wächter das dunkle UND das helle Grün mit 4,15 bzw. 4,45). Davor (Ausgangstor): **82 grün · 0 ROT** · die 17 neuen
+Zuletzt gemessen (2026-10-05, Fachbegriff ≠ Anweisung): **114 grün · 0 ROT** · `BEGRIFF:` 2 gefangen, dazu die fünf auf `?v=5` nachgezogenen Fälle (`INSTALL:`, `VORRAT:`, `GLAS:`, `RAND:`) gefangen, 0 blind, 0 tote Anker. Prüfkern byte-1:1 aus dem Auslieferungsprüfer: `KI-BEGRIFF` steht hier bei den **Angaben** (Klaus 2026-10-05: eine .md über eine Marktlücke nennt „prompt injection“ — das ist keine Anweisung und gehört nicht unter „keine Panik“). Die Angabe sagt, wie sie entsteht (feste Wortliste). Neu kommt auch `BILD-METADATEN-KI-ANWEISUNG` mit. Cache v5, `?v=5`.
+Davor (2026-10-02, Glas-Knöpfe): **99 grün · 0 ROT** · `GLAS:` 8 · `RAND:` 1 · `VORRAT:` 2 gefangen, 0 blind, 0 tote Anker (erst fing der neue Kontrast-Wächter das dunkle UND das helle Grün mit 4,15 bzw. 4,45). Davor (Ausgangstor): **82 grün · 0 ROT** · die 17 neuen
 Gegenprobe-Fälle **17 gefangen · 0 blind · 0 tote Anker**. Erster Lauf: 1 aus falschem Grund
 (die Probe wartete auf den Ordner, den der Fall wegnimmt, und stürzte ab), danach gefangen. Davor (Stufe 1): 49 grün · 13 gefangen.
 ⚠ Die Probe „… mit rot markierter Kopie der Stelle“ war ein Flatterer: sie las die Karte,
