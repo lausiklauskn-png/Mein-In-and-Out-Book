@@ -133,7 +133,7 @@ fall "BEGRIFF: die Angabe sagt nicht mehr „keine Anweisung“" assets/eingang.
 fall "PRIO: die Wortgrenze rechts fehlt (PINsel wird zu PIN)" assets/prioritaeten.js \
   '(?=$|[^\\p{L}\\p{N}])", "iu"' '", "iu"' "Wortgrenze"
 fall "PRIO: Stufe „aus“ sucht trotzdem" assets/prioritaeten.js \
-  'if (stufe === "aus") return;' '' 'Stufe .aus. sucht'
+  'if (stufe === "aus") return;' '' 'sucht die Wörter der Gruppe nicht'
 fall "PRIO: eine Empfehlung sagt „harmlos“" assets/prioritaeten.js \
   'streng: "Lies diese Stelle selbst' 'streng: "Wahrscheinlich harmlos. Lies diese Stelle selbst' "harmlos"
 fall "PRIO: der Satz sagt nicht mehr, wie der Befund entsteht" assets/prioritaeten.js \
