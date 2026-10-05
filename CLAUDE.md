@@ -116,6 +116,29 @@ Cache v4, `?v=4`. ⚠ Wer die `?v=` erhöht, zieht die Anker in `tests/gegenprob
 Entschieden, nicht gebaut: [`docs/BRIEF_2026-10-05_abhakliste.md`](docs/BRIEF_2026-10-05_abhakliste.md).
 Gilt für Auslieferungsprüfer, Sende-Prüfer und dieses Buch; Code dort erst nach Klaus' Freigabe je Stufe.
 
+## ⚑ Stufe 1 · Prioritätenliste (Klaus 2026-10-05)
+
+`assets/prioritaeten.js` (app-eigen, `window.Prioritaeten`, läuft auch in Node).
+Reiter **⚑ Prioritäten**: sechs Gruppen (Firmengeheimnisse · Bankdaten · Kundendaten ·
+Zugangsdaten · Verträge/Preise · eigene Wörter), je **streng · normal · aus**, vier
+Vorlagen (Handwerk, Kosmetikstudio, Büro, Privat), eigene Wörter (ab 3 Zeichen).
+Schlüssel **`inout_prioritaeten_v1`** — app-eigen, ein fremder Wert wird nicht geglaubt.
+
+- **Gefunden über eine feste Wortliste**, Wortgrenze per Buchstaben-Klasse (nicht `\b`,
+  das kennt kein „ü"), Groß/klein egal. Jeder Treffer nennt Wort, Gruppe, Stufe, Stelle
+  (Zeile) und sagt, dass ein zitiertes oder verneintes Wort ebenso gefunden wird.
+- **Nie „harmlos“, immer eine Empfehlung** (Klaus). Eine Probe sucht das Wort in Code und Oberfläche.
+- **Eingang:** eigener Kasten `[data-prio-treffer]`; die **Karte wird davon nicht rot** —
+  eingehende Post nennt Bankdaten ständig. Ein Prüfkern-Befund (IBAN …) bekommt die Marke
+  seiner Gruppe; „aus“ nimmt nur die Marke, nie den Befund.
+- **Ausgang:** „streng“ hält den ersten Tipp an (wie eine KI-Anweisung), ein zweiter geht
+  weiter; „normal“ steht nur in der Vorschau. Gelesen werden Kopf, Mailtext und Aufgabe, je mit eigener Zeilenzählung.
+- ⚠ **Benannte Grenzen:** die Liste ist in keiner Sicherung (dieses Buch hat noch keine) ·
+  Absender-Vertrauen und „Mit KI vorschlagen“ sind nicht gebaut (Stufe 1b) · der Ausgang
+  kennt noch keine Anhänge. Sende-Prüfer und Auslieferungsprüfer bekommen dieselbe Liste
+  später, je mit eigenem Schlüssel.
+- Proben: `smoke.mjs` (ohne Browser und im Browser) · Gegenprobe `NUR_FALL="PRIO:"` (11 Fälle). Cache v6, `?v=6`.
+
 ## Was leicht kaputtgeht
 
 - **Cache-Bump:** wer eine Datei aus `CORE` in `sw.js` ändert, erhöht
@@ -134,7 +157,8 @@ bash tests/gegenprobe.sh                # Wegwerf-Kopie, jeder Fall muss seine r
 NUR_ANKER=1 bash tests/gegenprobe.sh    # nur die Anker, in Sekunden
 ```
 
-Zuletzt gemessen (2026-10-05, Fachbegriff ≠ Anweisung): **114 grün · 0 ROT** · `BEGRIFF:` 2 gefangen, dazu die fünf auf `?v=5` nachgezogenen Fälle (`INSTALL:`, `VORRAT:`, `GLAS:`, `RAND:`) gefangen, 0 blind, 0 tote Anker. Prüfkern byte-1:1 aus dem Auslieferungsprüfer: `KI-BEGRIFF` steht hier bei den **Angaben** (Klaus 2026-10-05: eine .md über eine Marktlücke nennt „prompt injection“ — das ist keine Anweisung und gehört nicht unter „keine Panik“). Die Angabe sagt, wie sie entsteht (feste Wortliste). Neu kommt auch `BILD-METADATEN-KI-ANWEISUNG` mit. Cache v5, `?v=5`.
+Zuletzt gemessen (2026-10-05, Prioritätenliste): **147 grün · 0 ROT** · `PRIO:` **11 gefangen · 0 blind · 0 aus falschem Grund · 0 tote Anker** (erst 1 aus falschem Grund: mein Muster `Stufe .aus.` — der Punkt trifft im C-Locale ein Byte, „ sind drei); `NUR_ANKER` 57 · 0 tot (ein alter Anker `k.appendChild(box);` traf durch den neuen Kasten zweimal, der Kasten heißt jetzt `pkasten`).
+Davor (2026-10-05, Fachbegriff ≠ Anweisung): **114 grün · 0 ROT** · `BEGRIFF:` 2 gefangen, dazu die fünf auf `?v=5` nachgezogenen Fälle (`INSTALL:`, `VORRAT:`, `GLAS:`, `RAND:`) gefangen, 0 blind, 0 tote Anker. Prüfkern byte-1:1 aus dem Auslieferungsprüfer: `KI-BEGRIFF` steht hier bei den **Angaben** (Klaus 2026-10-05: eine .md über eine Marktlücke nennt „prompt injection“ — das ist keine Anweisung und gehört nicht unter „keine Panik“). Die Angabe sagt, wie sie entsteht (feste Wortliste). Neu kommt auch `BILD-METADATEN-KI-ANWEISUNG` mit. Cache v5, `?v=5`.
 Davor (2026-10-02, Glas-Knöpfe): **99 grün · 0 ROT** · `GLAS:` 8 · `RAND:` 1 · `VORRAT:` 2 gefangen, 0 blind, 0 tote Anker (erst fing der neue Kontrast-Wächter das dunkle UND das helle Grün mit 4,15 bzw. 4,45). Davor (Ausgangstor): **82 grün · 0 ROT** · die 17 neuen
 Gegenprobe-Fälle **17 gefangen · 0 blind · 0 tote Anker**. Erster Lauf: 1 aus falschem Grund
 (die Probe wartete auf den Ordner, den der Fall wegnimmt, und stürzte ab), danach gefangen. Davor (Stufe 1): 49 grün · 13 gefangen.
