@@ -65,7 +65,7 @@ fall "INSTALL: als App bleibt der Knopf stehen" assets/installieren.js \
 fall "INSTALL: ⟳ räumt auch fremde Vorräte" assets/installieren.js \
   'var EIGEN = /^inout-/;' 'var EIGEN = /./;' "nur den eigenen Vorrat"
 fall "INSTALL: die Datei wird nicht geladen" index.html \
-  '<script src="assets/installieren.js?v=4"></script>' '' "installieren.js steht im Vorrat und wird geladen|Absturz"
+  '<script src="assets/installieren.js?v=5"></script>' '' "installieren.js steht im Vorrat und wird geladen|Absturz"
 fall "KANON: der Prüfkern wird hier abgewandelt" assets/pruefer-anhang.js \
   '/* Auslieferungsprüfer — Anhänge und einzelne Dateien' '/* Auslieferungsprüfer: Anhänge und einzelne Dateien' "Kanon byte-1:1: assets/pruefer-anhang.js"
 fall "RECHT: Platzhalter statt echter Angaben im Impressum" impressum.html \
@@ -104,16 +104,16 @@ fall "KANON: Modul 25 wird hier abgewandelt" modules/25_pseudonym.js \
 fall "KANON: die Anbieter-Liste wird hier abgewandelt" assets/anbieter.js \
   'claude-opus-5' 'claude-opus-4' "Kanon byte-1:1: assets/anbieter.js"
 fall "VORRAT: ausgang.js fehlt im Installations-Vorrat" sw.js \
-  '"assets/ausgang.js?v=4"' '"assets/ausgang-alt.js?v=4"' "Vorrat nennen assets/ausgang.js|liegt wirklich da"
+  '"assets/ausgang.js?v=5"' '"assets/ausgang-alt.js?v=5"' "Vorrat nennen assets/ausgang.js|liegt wirklich da"
 
 fall "GLAS: die Knöpfe werden wieder fett" assets/style.css \
   'min-height:36px;padding:5px 13px' 'min-height:46px;padding:12px 20px' "schlank"
 fall "GLAS: der Glanzpunkt fehlt" assets/style.css \
   'background:radial-gradient(90px 60px at var(--mx,50%) var(--my,20%),rgb(255 255 255/.55),transparent 60%),' 'background:' "Glanzpunkt"
 fall "GLAS: glas.js wird nicht geladen" index.html \
-  'src="assets/glas.js?v=4"' 'src="assets/glas-alt.js?v=4"' "glas.js steht im Vorrat|Wackeln"
+  'src="assets/glas.js?v=5"' 'src="assets/glas-alt.js?v=5"' "glas.js steht im Vorrat|Wackeln"
 fall "GLAS: glas.js fehlt im Vorrat" sw.js \
-  '"assets/glas.js?v=4"' '"assets/glas-alt.js?v=4"' "glas.js steht im Vorrat"
+  '"assets/glas.js?v=5"' '"assets/glas-alt.js?v=5"' "glas.js steht im Vorrat"
 fall "GLAS: der CSS-Riegel für weniger Bewegung ist weg" assets/style.css \
   '@media (prefers-reduced-motion:reduce){.btn,.zeile{transform:none!important;transition:none}' '@media (prefers-reduced-motion:reduce){.btn,.zeile{transition:none}' "weniger Bewegung"
 fall "GLAS: das Skript wackelt trotz weniger Bewegung" assets/glas.js \
@@ -123,7 +123,12 @@ fall "GLAS: im Dunkeln ist der Knopf wieder hell" assets/style.css \
 fall "GLAS: im Hellen ist der Knopf zu hell" assets/style.css \
   '--h1:#117a7a;' '--h1:#3cb4b4;' "lesbar \\(hell"
 fall "RAND: Manifest nennt eine andere Icon-Fassung" manifest.json \
-  'icons/icon-512.png?v=4' 'icons/icon-512.png?v=3' "Manifest|manifest"
+  'icons/icon-512.png?v=5' 'icons/icon-512.png?v=3' "Manifest|manifest"
+
+fall "BEGRIFF: ein Fachbegriff macht die Karte wieder rot" assets/eingang.js \
+  ', "KI-BEGRIFF": 1 };' ' };' 'Fachbegriff .* macht die Karte NICHT rot'
+fall "BEGRIFF: die Angabe sagt nicht mehr „keine Anweisung“" assets/eingang.js \
+  '"KI-BEGRIFF":"Fachbegriff zu KI-Angriffen (keine Anweisung)",' '"KI-BEGRIFF":"Fachbegriff zu KI-Angriffen",' 'Angabe .*Fachbegriff'
 
 echo "$n Fälle · $gefangen gefangen · $blind blind · $falsch aus falschem Grund · $tot tote Anker"
 rm -rf "$(dirname "$KOPIE")"

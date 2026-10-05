@@ -14,7 +14,7 @@
 (function () {
   "use strict";
   var GESCHEHEN = "schleuse-geteilt";      // Vorrat, in den sw.js geteilte Dateien legt
-  var ANGABEN = { "PERSONENBEZUG": 1, "RECHNUNGSDATEN": 1, "PDF-METADATEN": 1, "BILD-METADATEN": 1, "PDF-ALTFASSUNG": 1 };
+  var ANGABEN = { "PERSONENBEZUG": 1, "RECHNUNGSDATEN": 1, "PDF-METADATEN": 1, "BILD-METADATEN": 1, "PDF-ALTFASSUNG": 1, "KI-BEGRIFF": 1 };
   var KURZ = {"FREMDE-ADRESSE":"fremde Adresse","SCHLUESSEL":"Zugangsschlüssel","PERSONENBEZUG":"Angabe zu einer Person",
     "RECHNUNGSDATEN":"Abrechnungsdaten","PDF-VERWEIS":"Verweis nach außen","PDF-AKTION":"eingebettete Aktion","PDF-ANHANG":"Datei im PDF",
     "PDF-METADATEN":"Metadaten","PDF-ALTFASSUNG":"frühere Fassung","PDF-KI-ANWEISUNG":"Anweisung an eine KI","BILD-KI-ANWEISUNG":"Anweisung im Bild",
@@ -23,7 +23,8 @@
     "ANHANG-TARNUNG":"Endung täuscht","ANHANG-PROGRAMM":"Programm","BILD-ANHAENGSEL":"Daten hinter dem Bild","BILD-METADATEN":"Metadaten im Bild",
     "SVG-SKRIPT":"Skript in Grafik","SVG-VERWEIS":"Grafik holt von außen","OFFICE-MAKRO":"Makro","OFFICE-VERWEIS":"Dokument holt von außen",
     "OFFICE-EINBETTUNG":"eingebettete Datei","ANHANG-DOPPELENDUNG":"Anhang mit zwei Endungen","VERSTECKTER-TEXT":"versteckter Text",
-    "UNSICHTBARE-ZEICHEN":"unsichtbare Zeichen","KI-ANWEISUNG":"Anweisung an eine KI","ABSENDER-TARNUNG":"Absender passt nicht",
+    "UNSICHTBARE-ZEICHEN":"unsichtbare Zeichen","KI-ANWEISUNG":"Anweisung an eine KI","KI-BEGRIFF":"Fachbegriff zu KI-Angriffen (keine Anweisung)",
+    "BILD-METADATEN-KI-ANWEISUNG":"Anweisung in den Bild-Metadaten","ABSENDER-TARNUNG":"Absender passt nicht",
     "PRUEFUNG-DURCHGEFALLEN":"Echtheitsprüfung durchgefallen","KONTO-WECHSEL":"geänderte Bankverbindung","ZUGANGSDATEN":"fragt nach Zugangsdaten",
     "DRUCK":"Frist und Drohung"};
 

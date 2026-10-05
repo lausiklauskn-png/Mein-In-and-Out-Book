@@ -29,9 +29,9 @@ const sha = (p) => createHash("sha256").update(readFileSync(join(WURZEL, p))).di
 /* Der Prüfkern wird im Auslieferungsprüfer gepflegt (origin/main 35d003c).
    Wer ihn neu kopiert, zieht diese Pins nach. Nie hier abwandeln. */
 const KANON = {
-  "assets/pruefer-anhang.js": "3f0c28f0294ff65f754702fad5f1749f244082ebebff57d31a74592da9abfc09",
+  "assets/pruefer-anhang.js": "d249fd665af2f112e9c330eac6ca948a24481fee2df23df62214d4102be6d9d9",
   "assets/pruefer-formate.js": "b057aa084f4b7821fce96f2b717ae51d183a0d8e3bcb67a08edc9fdfa3862a98",
-  "assets/pruefer-mail.js": "27e86606a3de4592100f20224eb955cb2f6e48339a82dc40e48fe309f8bdc989",
+  "assets/pruefer-mail.js": "cdf3ca7881bfa68763a2c0be7436d35a65bea4dbd03f606e02eaec5c613632d7",
   "assets/pruefer.js": "9b004f0c76bf8d79b75d361b5b8d4cae87d2b2becd229f2d37391e93566300fd",
   "vendor/pdfjs/pdf.min.js": "978fd1b2d134a98e98966186a97777bebf87d8e770dadab1ece3687e21a5aa6c",
   "vendor/pdfjs/pdf.worker.min.js": "38cde5311957b86bc3669f93e7d2566de333a90055ed6635bef60d9bf00e96f2",
@@ -187,6 +187,17 @@ try {
   await page.waitForFunction(() => document.querySelectorAll(".karte").length === 3 && document.querySelector(".karte").getAttribute("data-lage") !== "laeuft");
   k = await karte("Eingefügter Text", 5000);
   ok("eine Mailadresse macht eingehende Post NICHT rot (Angabe, kein Befund)", k && k.lage === "sauber" && k.angaben >= 1, JSON.stringify(k));
+
+  /* 3b · nur der Fachbegriff „prompt injection" (Klaus 2026-10-05, Marktlücke-.md): Angabe, nicht rot, keine Panik */
+  await page.fill("#textFeld", "Marktlücke\nAngriffe wie prompt injection nehmen zu.\nDazu gibt es Studien.");
+  await page.click("#textPruefen");
+  await page.waitForFunction(() => document.querySelectorAll(".karte").length === 4 && document.querySelector(".karte").getAttribute("data-lage") !== "laeuft");
+  const begriff = await page.evaluate(() => { const k = document.querySelector(".karte");
+    return { lage: k.getAttribute("data-lage"), text: k.textContent, wasTun: k.querySelectorAll("[data-was-tun]").length }; });
+  ok("ein bloßer Fachbegriff („prompt injection\") macht die Karte NICHT rot", begriff.lage === "sauber", JSON.stringify(begriff).slice(0, 300));
+  ok("… steht als Angabe „Fachbegriff … (keine Anweisung)\" da und sagt, wie der Befund entsteht",
+    /Fachbegriff zu KI-Angriffen \(keine Anweisung\)/.test(begriff.text) && /feste Wortliste/.test(begriff.text), begriff.text.slice(0, 300));
+  ok("… ohne „Was jetzt tun\"", begriff.wasTun === 0);
 
   /* 4 · Test-PDF: unsichtbarer Text */
   await page.click("details[data-testliste] summary");
