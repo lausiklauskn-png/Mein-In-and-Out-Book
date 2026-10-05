@@ -117,6 +117,49 @@ ok("Name überall „Mein In-and-Out-Book\", nirgends „Meine In-and-Out-Book\"
   ["index.html", "impressum.html", "datenschutz.html", "manifest.json"].every((p) => !/Meine In-and-Out/i.test(lies(p))) && manifest.name === "Mein In-and-Out-Book");
 
 /* ══ B · im Browser ══ */
+/* ══ Prioritätenliste (Stufe 1, Klaus 2026-10-05) — Rechnung ohne Browser ══ */
+{
+  const vm = await import("node:vm");
+  const kasten = { localStorage: { _d: {}, getItem(k) { return this._d[k] ?? null; }, setItem(k, v) { this._d[k] = String(v); } } };
+  kasten.globalThis = kasten;
+  vm.runInNewContext(lies("assets/prioritaeten.js"), kasten);
+  const P = kasten.Prioritaeten;
+  ok("Prioritaeten lädt ohne Browser", !!(P && P.treffer));
+  if (P) {
+    const g = P.grundstand();
+    ok("Grundstand: Bank, Kunden, Zugänge streng · Geheim, Vertrag, Eigene normal",
+      g.stufen.bank === "streng" && g.stufen.kunden === "streng" && g.stufen.zugang === "streng" && g.stufen.geheim === "normal" && g.stufen.vertrag === "normal" && g.stufen.eigen === "normal", JSON.stringify(g.stufen));
+    const t = P.treffer([{ text: "Hallo,\nanbei die neue Bankverbindung.\nGruß", stelle: "Mail" }], g, "eingang");
+    ok("ein Wort der Liste wird gefunden, mit Gruppe, Stufe und Zeile", t.length === 1 && t[0].gruppe === "bank" && t[0].stufe === "streng" && t[0].stelle === "Mail, Zeile 2", JSON.stringify(t));
+    ok("… der Satz sagt, wie der Befund entsteht (feste Wortliste, Zitat wird ebenso gefunden)", t[0] && /feste Wortliste/.test(t[0].satz) && /zitiert/.test(t[0].satz), t[0] && t[0].satz);
+    ok("… und trägt eine Empfehlung", t[0] && t[0].empfehlung === P.EMPFEHLUNG.eingang.streng);
+    const alleTexte = JSON.stringify([P.EMPFEHLUNG, P.GRUPPEN, P.VORLAGEN]) + lies("assets/prioritaeten.js");
+    ok("nirgends steht „harmlos\" (Klaus: nie harmlos, immer eine Empfehlung)", !/harmlos/i.test(alleTexte));
+    ok("Wortgrenze: „Lastschriftverfahren\" ist nicht „Lastschrift\", „PINsel\" nicht „PIN\"",
+      P.treffer([{ text: "Lastschriftverfahren und PINsel" }], g, "eingang").length === 0);
+    ok("Wortgrenze mit Umlaut: „Überweisung\" am Zeilenanfang wird gefunden", P.treffer([{ text: "Überweisung folgt" }], g, "eingang").length === 1);
+    ok("Groß/klein egal: „iban\" wird gefunden", P.treffer([{ text: "die iban lautet" }], g, "eingang").length === 1);
+    const aus = P.sauber({ stufen: { bank: "aus" } });
+    ok("Stufe „aus\" sucht die Wörter der Gruppe nicht", P.treffer([{ text: "IBAN" }], aus, "eingang").length === 0);
+    ok("… und gibt einem Prüfkern-Befund keinen Zusatz (Befund bleibt, nur ohne Marke)", P.stufeFuer("IBAN", aus) === null && P.stufeFuer("IBAN", g).stufe === "streng");
+    ok("eine Kennung ohne Gruppe bekommt keine Stufe", P.stufeFuer("KI-ANWEISUNG", g) === null);
+    const eig = P.sauber({ eigen: ["Projekt Nordlicht", "x", " "] });
+    ok("eigene Wörter: zu kurze fallen weg, ein Ausdruck mit Leerzeichen wird gefunden",
+      eig.eigen.length === 1 && P.treffer([{ text: "zum Projekt Nordlicht" }], eig, "ausgang")[0].gruppe === "eigen");
+    ok("Ausgang bekommt die Empfehlung fürs Hinausgehen", P.treffer([{ text: "Passwort: 1234" }], g, "ausgang")[0].empfehlung === P.EMPFEHLUNG.ausgang.streng);
+    ok("ein fremder Speicherwert wird nicht geglaubt (unbekannte Stufe → Vorgabe)", P.sauber({ stufen: { bank: "egal" } }).stufen.bank === "streng");
+    const v = P.vorlage("studio");
+    ok("Vorlage Kosmetikstudio: Kunden streng, eigene Wörter dabei", v && v.stufen.kunden === "streng" && v.eigen.includes("Hautbild"));
+    ok("eine unbekannte Vorlage ergibt nichts", P.vorlage("gibt-es-nicht") === null);
+  }
+}
+const prioQ = lies("assets/prioritaeten.js");
+ok("prioritaeten.js setzt kein innerHTML", !/innerHTML/.test(prioQ));
+ok("prioritaeten.js steht im Vorrat und wird VOR eingang.js geladen", core.some((u) => u.startsWith("assets/prioritaeten.js")) &&
+  seite.indexOf('src="assets/prioritaeten.js') > 0 && seite.indexOf('src="assets/prioritaeten.js') < seite.indexOf('src="assets/eingang.js'));
+ok("der Speicher-Schlüssel ist app-eigen (inout_prioritaeten_v1) und steht gleich in Eingang, Ausgang und Seite",
+  [eingang, lies("assets/ausgang.js"), seite].every((x) => x.includes('"inout_prioritaeten_v1"')));
+
 let pw;
 try { pw = await import("playwright-core"); } catch {
   console.log("⊘ nicht lauffähig: playwright-core fehlt (npm install). " + gruen + " grün · " + rot + " ROT ohne Browser.");
@@ -450,6 +493,65 @@ try {
   const ruhigVar = await rp.evaluate(() => document.querySelector("#textPruefen").style.getPropertyValue("--ry"));
   ok("… und das Skript rechnet dann gar nicht erst (kein --ry gesetzt)", ruhigVar === "", ruhigVar);
   await rctx.close();
+
+  /* 9b · Prioritätenliste im Browser (Stufe 1, Klaus 2026-10-05) */
+  {
+    const pctx = await browser.newContext({ viewport: { width: 1280, height: 900 }, permissions: ["clipboard-read", "clipboard-write"] });
+    const pp = await pctx.newPage();
+    await pp.goto(BASIS + "index.html"); await pp.waitForFunction(() => window.__inout && window.Prioritaeten);
+    // Eingang: ein strenges Wort → eigener Kasten mit Empfehlung, die Karte wird NICHT rot
+    await pp.fill("#textFeld", "Hallo,\nunsere neue Bankverbindung findest du unten.\nGruß");
+    await pp.click("#textPruefen");
+    await pp.waitForFunction(() => { const k = document.querySelector(".karte"); return k && k.getAttribute("data-lage") !== "laeuft"; });
+    const pe = await pp.evaluate(() => { const k = document.querySelector(".karte"), b = k.querySelector("[data-prio-treffer]");
+      return { lage: k.getAttribute("data-lage"), n: b && b.getAttribute("data-prio-treffer"), li: b ? [...b.querySelectorAll("li")].map((l) => [l.getAttribute("data-prio-gruppe"), l.getAttribute("data-prio-stufe")]) : [],
+        empf: b ? [...b.querySelectorAll(".empfehlung")].map((e) => e.textContent) : [], text: k.textContent }; });
+    ok("Eingang: ein Wort der Liste steht im Kasten „Prioritätenliste\" mit Gruppe und Stufe", pe.n === "1" && pe.li[0] && pe.li[0][0] === "bank" && pe.li[0][1] === "streng", JSON.stringify(pe).slice(0, 300));
+    ok("… mit „Empfehlung: …\" und dem Satz, wie der Befund entsteht", pe.empf.length === 1 && /^Empfehlung: /.test(pe.empf[0]) && /feste Wortliste/.test(pe.text), JSON.stringify(pe.empf));
+    ok("… die Karte bleibt dabei ohne Befund (eingehende Post nennt Bankdaten ständig)", pe.lage === "sauber", pe.lage);
+    ok("… und nirgends steht „harmlos\"", !/harmlos/i.test(pe.text));
+    // Einstellungen: Reiter, Stufe umstellen, bleibt nach Neuladen
+    await pp.click('[data-tor="einstellungen"]');
+    const reiter = await pp.evaluate(() => [!document.querySelector('[data-tor-teil="einstellungen"]').hidden, document.querySelectorAll("#prioEinst [data-prio-gruppe]").length,
+      document.querySelectorAll("[data-prio-vorlage]").length]);
+    ok("der Reiter „⚑ Prioritäten\" zeigt sechs Gruppen und vier Vorlagen", reiter[0] && reiter[1] === 6 && reiter[2] === 4, String(reiter));
+    await pp.check('input[name="prio-bank"][value="aus"]');
+    await pp.fill("#prioEigen", "Projekt Nordlicht"); await pp.click("#prioEigenAdd");
+    const gesp = await pp.evaluate(() => JSON.parse(localStorage.getItem("inout_prioritaeten_v1") || "null"));
+    ok("Stufe und eigenes Wort werden unter inout_prioritaeten_v1 gespeichert", gesp && gesp.stufen.bank === "aus" && gesp.eigen.includes("Projekt Nordlicht"), JSON.stringify(gesp));
+    await pp.reload(); await pp.waitForFunction(() => window.Prioritaeten && document.querySelector("[data-prio-gruppe]"));
+    const nach = await pp.evaluate(() => [document.querySelector('input[name="prio-bank"][value="aus"]').checked, !!document.querySelector('[data-prio-weg="Projekt Nordlicht"]')]);
+    ok("… und stehen nach dem Neuladen noch da", nach[0] && nach[1], String(nach));
+    // „aus" versteckt keinen Prüfkern-Befund: eine IBAN wird weiter gemeldet, nur ohne Prioritäts-Marke
+    await pp.click('[data-tor="eingang"]');
+    await pp.fill("#textFeld", "Bitte überweise auf DE89 3704 0044 0532 0130 00, danke.");
+    await pp.click("#textPruefen");
+    await pp.waitForFunction(() => { const k = document.querySelector(".karte"); return k && k.getAttribute("data-lage") !== "laeuft"; });
+    const ib = await pp.evaluate(() => { const k = document.querySelector(".karte"); return { iban: /IBAN|Kontonummer/i.test(k.textContent), marke: k.querySelectorAll(".prio-marke").length,
+      kasten: (k.querySelector("[data-prio-treffer]") || { getAttribute: () => null }).getAttribute("data-prio-treffer") }; });
+    ok("Stufe „aus\": die IBAN steht weiter da (Prüfkern-Befunde bleiben immer)", ib.iban, JSON.stringify(ib));
+    ok("… nur ohne Prioritäts-Marke und ohne Treffer im Kasten", ib.marke === 0 && (ib.kasten === null || ib.kasten === "0"), JSON.stringify(ib));
+    // Vorlage
+    await pp.click('[data-tor="einstellungen"]'); await pp.click('[data-prio-vorlage="buero"]');
+    const vb = await pp.evaluate(() => JSON.parse(localStorage.getItem("inout_prioritaeten_v1")).stufen);
+    ok("eine Vorlage setzt die Stufen (Büro: alles streng außer Eigene)", vb.geheim === "streng" && vb.vertrag === "streng" && vb.bank === "streng", JSON.stringify(vb));
+    // Ausgang: strenges Wort hält den ersten Tipp an, der zweite geht weiter
+    await pp.click('[data-tor="ausgang"]');
+    await pp.fill("#ausRoh", "Von: Erika Sommer\nBetreff: Unterlagen\n\nHier das Passwort für den Server, wie besprochen.\nGruß");
+    await pp.click("#ausEinfuegen"); await pp.waitForSelector("#ausText");
+    await pp.evaluate(() => navigator.clipboard.writeText("vorher"));
+    const vorsch = await pp.evaluate(() => { const b = document.querySelector("#ausOffen [data-prio-treffer]"); return b && b.getAttribute("data-prio-treffer"); });
+    ok("Ausgang: die Vorschau zeigt den Prioritäts-Treffer", vorsch === "1", String(vorsch));
+    await pp.click("#ausKopieren");
+    const halt = await pp.evaluate(async () => ({ m: document.getElementById("ausMeldung").textContent, c: await navigator.clipboard.readText() }));
+    ok("Ausgang: ein strenges Wort hält den ersten Tipp an, nennt Wort, Gruppe, Zeile und Empfehlung",
+      /Angehalten: deine Prioritätenliste/.test(halt.m) && /Passwort/.test(halt.m) && /Mailtext, Zeile 1/.test(halt.m) && /Empfehlung:/.test(halt.m) && halt.c === "vorher", JSON.stringify(halt));
+    await pp.click("#ausKopieren");
+    await pp.waitForFunction(() => /Kopiert/.test(document.getElementById("ausMeldung").textContent)).catch(() => {});
+    const weiter = await pp.evaluate(() => navigator.clipboard.readText());
+    ok("… ein zweiter Tipp geht weiter", weiter !== "vorher" && /Passwort/.test(weiter), weiter.slice(0, 120));
+    await pctx.close();
+  }
 
   /* 10 · Handy */
   const h = await browser.newPage({ viewport: { width: 360, height: 740 } });

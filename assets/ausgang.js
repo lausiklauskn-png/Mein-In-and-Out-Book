@@ -133,6 +133,17 @@
       return s.kennung === "KI-ANWEISUNG" || s.kennung === "UNSICHTBARE-ZEICHEN" || s.kennung === "VERSTECKTER-TEXT";
     });
   }
+  /* Prioritätenliste (Stufe 1): „streng" hält wie eine KI-Anweisung beim
+     ersten Tipp an, ein zweiter Tipp geht weiter. Gesucht wird im Text, der
+     hinausgeht, VOR dem Verdecken — was der Nutzer selbst schützen will,
+     soll er sehen, auch wenn ein Teil davon gleich verdeckt wird. */
+  var PRIO = window.Prioritaeten, PRIO_SCHLUESSEL = "inout_prioritaeten_v1";
+  function prioTreffer(m) {
+    if (!PRIO) return null;
+    var kopf = ganzeMail(m).slice(0, ganzeMail(m).length - String(m.text || "").length).trim();
+    return PRIO.treffer([{ text: kopf, stelle: "Kopf" }, { text: String(m.text || ""), stelle: "Mailtext" },
+      { text: String(m.bitte || "").trim(), stelle: "Aufgabe an die KI" }], PRIO.laden(PRIO_SCHLUESSEL), "ausgang");
+  }
   var weiterFuer = null;   // nur im Speicher: der Text, für den ein zweiter Tipp gilt
   /* bereit(m) → { text, map, treffer } oder null (dann steht der Grund in meldung). */
   function bereit(m, meldung) {
@@ -149,6 +160,16 @@
         weiterFuer = schluessel;
         meldung("Angehalten: im Mailtext steht etwas, das sich an eine KI richtet (" + ki.map(function (s) { return (s.zeile ? "Zeile " + s.zeile : s.kennung); }).join(", ") +
           "). Wer das an eine KI gibt, gibt ihr diese Anweisung mit. Noch einmal tippen, um trotzdem weiterzugehen.");
+        return null;
+      }
+      var pt = prioTreffer(m);
+      if (pt === null) { weiterFuer = schluessel; meldung("Angehalten: die Prioritätenliste ist nicht geladen (UNGEPRÜFT). Noch einmal tippen, um trotzdem weiterzugehen."); return null; }
+      var streng = pt.filter(function (x) { return x.stufe === "streng"; });
+      if (streng.length) {
+        weiterFuer = schluessel;
+        meldung("Angehalten: deine Prioritätenliste meldet " + streng.length + " strenge Stelle(n) — " +
+          streng.slice(0, 5).map(function (x) { return "„" + x.wort + "\" (" + x.gruppeName + ", " + x.stelle + ")"; }).join(", ") +
+          ". Gefunden über eine feste Wortliste. Empfehlung: " + PRIO.EMPFEHLUNG.ausgang.streng + " Noch einmal tippen, um trotzdem weiterzugehen.");
         return null;
       }
     }
@@ -385,6 +406,18 @@
     box.appendChild(el("p", "leise", r.findings.length
       ? r.findings.length + " Stelle(n) werden verdeckt: " + Object.keys(n).map(function (k) { return (SORTE[k] || k) + " " + n[k]; }).join(" · ")
       : "Nichts zu verdecken gefunden. Namen, die kein Muster kennt, trägst du oben unter „Weitere Namen\" ein."));
+    var pt = prioTreffer(m);
+    if (pt && pt.length) {
+      var pb = el("div", "prio-treffer"); pb.setAttribute("data-prio-treffer", String(pt.length));
+      pb.appendChild(el("b", "", "⚑ Deine Prioritätenliste: " + pt.length + " Stelle(n) im Text, der hinausgeht"));
+      var ul = el("ul");
+      pt.forEach(function (x) {
+        var li = el("li", "", x.satz + " "); li.setAttribute("data-prio-gruppe", x.gruppe); li.setAttribute("data-prio-stufe", x.stufe);
+        li.appendChild(el("span", "stelle", x.stelle)); li.appendChild(el("span", "empfehlung", "Empfehlung: " + x.empfehlung));
+        ul.appendChild(li);
+      });
+      pb.appendChild(ul); box.appendChild(pb);
+    } else if (pt === null) { var pu = el("p", "leise", "Prioritätenliste nicht geladen — ungeprüft."); pu.setAttribute("data-prio-treffer", "ungeprueft"); box.appendChild(pu); }
     box.appendChild(ansicht === "ki" ? textMitPlatzhaltern(r.text) : textMitMarken(text, r.findings, "fund"));
   }
 
