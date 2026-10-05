@@ -14,7 +14,7 @@
 (function () {
   "use strict";
   var GESCHEHEN = "schleuse-geteilt";      // Vorrat, in den sw.js geteilte Dateien legt
-  var ANGABEN = { "PERSONENBEZUG": 1, "RECHNUNGSDATEN": 1, "PDF-METADATEN": 1, "BILD-METADATEN": 1, "PDF-ALTFASSUNG": 1 };
+  var ANGABEN = { "PERSONENBEZUG": 1, "RECHNUNGSDATEN": 1, "PDF-METADATEN": 1, "BILD-METADATEN": 1, "PDF-ALTFASSUNG": 1, "KI-BEGRIFF": 1 };
   var KURZ = {"FREMDE-ADRESSE":"fremde Adresse","SCHLUESSEL":"Zugangsschlüssel","PERSONENBEZUG":"Angabe zu einer Person",
     "RECHNUNGSDATEN":"Abrechnungsdaten","PDF-VERWEIS":"Verweis nach außen","PDF-AKTION":"eingebettete Aktion","PDF-ANHANG":"Datei im PDF",
     "PDF-METADATEN":"Metadaten","PDF-ALTFASSUNG":"frühere Fassung","PDF-KI-ANWEISUNG":"Anweisung an eine KI","BILD-KI-ANWEISUNG":"Anweisung im Bild",
@@ -23,11 +23,21 @@
     "ANHANG-TARNUNG":"Endung täuscht","ANHANG-PROGRAMM":"Programm","BILD-ANHAENGSEL":"Daten hinter dem Bild","BILD-METADATEN":"Metadaten im Bild",
     "SVG-SKRIPT":"Skript in Grafik","SVG-VERWEIS":"Grafik holt von außen","OFFICE-MAKRO":"Makro","OFFICE-VERWEIS":"Dokument holt von außen",
     "OFFICE-EINBETTUNG":"eingebettete Datei","ANHANG-DOPPELENDUNG":"Anhang mit zwei Endungen","VERSTECKTER-TEXT":"versteckter Text",
-    "UNSICHTBARE-ZEICHEN":"unsichtbare Zeichen","KI-ANWEISUNG":"Anweisung an eine KI","ABSENDER-TARNUNG":"Absender passt nicht",
+    "UNSICHTBARE-ZEICHEN":"unsichtbare Zeichen","KI-ANWEISUNG":"Anweisung an eine KI","KI-BEGRIFF":"Fachbegriff zu KI-Angriffen (keine Anweisung)",
+    "BILD-METADATEN-KI-ANWEISUNG":"Anweisung in den Bild-Metadaten","ABSENDER-TARNUNG":"Absender passt nicht",
     "PRUEFUNG-DURCHGEFALLEN":"Echtheitsprüfung durchgefallen","KONTO-WECHSEL":"geänderte Bankverbindung","ZUGANGSDATEN":"fragt nach Zugangsdaten",
     "DRUCK":"Frist und Drohung"};
 
-  var A = window.PrueferAnhang, M = window.PrueferMail, F = window.PrueferFormate;
+  var A = window.PrueferAnhang, M = window.PrueferMail, F = window.PrueferFormate, PRIO = window.Prioritaeten;
+  var PRIO_SCHLUESSEL = "inout_prioritaeten_v1";
+  function prioStand() { return PRIO ? PRIO.laden(PRIO_SCHLUESSEL) : null; }
+  /* Die lesbaren Texte eines Prüf-Ergebnisses, für die Prioritätenliste. */
+  function texteVon(r, vorsilbe) {
+    var x = [];
+    if (r.seiten && r.seiten.length) r.seiten.forEach(function (s) { x.push({ text: s.text, stelle: (vorsilbe ? vorsilbe + ", " : "") + "Seite " + s.seite }); });
+    else if (r.text) x.push({ text: r.text, stelle: vorsilbe || "" });
+    return x;
+  }
   var aus = document.getElementById("ergebnisse");
   function el(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
 
@@ -67,10 +77,34 @@
   }
 
   /* Eine Karte füllen. befunde: [{kennung, satz, stelle}] */
+  /* Treffer der Prioritätenliste: eigener Kasten, macht die Karte nicht rot
+     (eingehende Post nennt Verträge und Kontonummern ständig). Jeder Treffer
+     sagt, wie er zustande kam, und trägt eine Empfehlung — nie „harmlos". */
+  function prioKasten(k, info, st) {
+    if (!PRIO) { if (info.texte && info.texte.length) { var u = el("p", "leise", "Prioritätenliste nicht geladen — ungeprüft."); u.setAttribute("data-prio-treffer", "ungeprueft"); k.appendChild(u); } return; }
+    var t = PRIO.treffer(info.texte || [], st, "eingang");
+    if (!t.length) return;
+    var pkasten = el("div", "prio-treffer");
+    pkasten.setAttribute("data-prio-treffer", String(t.length));
+    var streng = t.filter(function (x) { return x.stufe === "streng"; }).length;
+    pkasten.appendChild(el("b", "", "⚑ Deine Prioritätenliste: " + t.length + " Stelle(n)" + (streng ? ", davon " + streng + " streng" : "")));
+    var ul = el("ul");
+    t.forEach(function (x) {
+      var li = el("li"); li.setAttribute("data-prio-gruppe", x.gruppe); li.setAttribute("data-prio-stufe", x.stufe);
+      li.appendChild(document.createTextNode(x.satz));
+      if (x.stelle) li.appendChild(el("span", "stelle", x.stelle));
+      li.appendChild(el("span", "empfehlung", "Empfehlung: " + x.empfehlung));
+      ul.appendChild(li);
+    });
+    pkasten.appendChild(ul);
+    k.appendChild(pkasten);
+  }
+
   function fuellen(k, info) {
     var warn = info.befunde.filter(function (b) { return !ANGABEN[b.kennung]; });
     var angaben = info.befunde.filter(function (b) { return ANGABEN[b.kennung]; });
     var lage = warn.length ? "befund" : info.ungeprueft ? "ungeprueft" : "sauber";
+    var st = prioStand();
     k.setAttribute("data-lage", lage);
     k.textContent = "";
     var kopf = el("div", "kopf");
@@ -89,6 +123,8 @@
         li.appendChild(el("b", "", (KURZ[b.kennung] || b.kennung) + ": "));
         li.appendChild(document.createTextNode(b.satz));
         if (b.stelle) li.appendChild(el("span", "stelle", b.stelle));
+        var pr = PRIO && st ? PRIO.stufeFuer(b.kennung, st) : null;
+        if (pr) { var pm = el("span", "prio-marke " + pr.stufe, "⚑ " + pr.gruppeName + " (" + pr.stufe + ")"); pm.setAttribute("data-prio-stufe", pr.stufe); li.appendChild(pm); }
         ul.appendChild(li);
       });
       k.appendChild(ul);
@@ -109,6 +145,7 @@
     } else if (lage === "sauber") {
       k.appendChild(el("p", "leise", "Nichts gefunden von dem, wonach gesucht wird. Kein Virenscanner."));
     }
+    prioKasten(k, info, st);
     if (angaben.length) {
       var d = el("details", "hinweise");
       d.setAttribute("data-angaben", String(angaben.length));
@@ -172,7 +209,7 @@
     }
     return A.pruefe(name, bytes).then(function (r) {
       var befunde = r.befunde.map(function (b) { return { kennung: b.kennung, satz: b.satz, stelle: b.stelle || "" }; }).concat(textTreffer(r, name));
-      fuellen(k, { name: name, art: r.artName + " · " + A.gross(bytes.length), befunde: befunde, roheBefunde: r.befunde,
+      fuellen(k, { name: name, art: r.artName + " · " + A.gross(bytes.length), befunde: befunde, roheBefunde: r.befunde, texte: texteVon(r, ""),
         ungeprueft: !!r.bildUngeprueft, ungeprueftSatz: r.ungeprueftSatz, hinweise: (vorweg || []).concat(r.hinweise || []), bytes: bytes });
     }, function () {
       fuellen(k, { name: name, befunde: [], ungeprueft: true, ungeprueftSatz: "ungeprüft", hinweise: ["Die Datei ließ sich nicht lesen."] });
@@ -187,19 +224,21 @@
       if (t.kennung === "PERSONENBEZUG" || t.kennung === "SCHLUESSEL") befunde.push({ kennung: t.kennung, satz: t.satz, stelle: t.zeile ? "Zeile " + t.zeile : "" });
     });
     var hinweise = r.hinweise.slice(), ungeprueft = !M, satz = M ? "" : "ungeprüft";
+    var texte = [{ text: r.text || text, stelle: "" }];
     var anh = A ? A.ausMail(text) : [];
-    if (!anh.length) { fuellen(k, { name: name, art: "Text", befunde: befunde, ungeprueft: ungeprueft, ungeprueftSatz: satz, hinweise: hinweise }); return Promise.resolve(); }
-    fuellen(k, { name: name, art: "E-Mail", befunde: befunde, hinweise: hinweise.concat(["Anhänge werden gelesen …"]) });
+    if (!anh.length) { fuellen(k, { name: name, art: "Text", befunde: befunde, texte: texte, ungeprueft: ungeprueft, ungeprueftSatz: satz, hinweise: hinweise }); return Promise.resolve(); }
+    fuellen(k, { name: name, art: "E-Mail", befunde: befunde, texte: texte, hinweise: hinweise.concat(["Anhänge werden gelesen …"]) });
     return Promise.all(anh.map(function (a) {
       if (a.zuGross) { hinweise.push("Anhang „" + a.name + "\" ist zu groß und wurde NICHT geöffnet — ungeprüft."); ungeprueft = true; return null; }
       return A.pruefe(a.name, a.bytes).then(function (x) {
         x.befunde.forEach(function (b) { befunde.push({ kennung: b.kennung, satz: b.satz, stelle: "Anhang " + a.name }); });
+        texte = texte.concat(texteVon(x, "Anhang " + a.name));
         textTreffer(x, a.name).forEach(function (t) { t.stelle = "Anhang " + a.name + (t.stelle ? ", " + t.stelle : ""); befunde.push(t); });
         if (x.bildUngeprueft) { ungeprueft = true; satz = satz || ("Anhang „" + a.name + "\": " + (x.ungeprueftSatz || "ungeprüft")); }
         hinweise.push("Anhang „" + a.name + "\" gelesen (nicht ausgeführt): " + x.artName + ".");
       }, function () { ungeprueft = true; hinweise.push("Anhang „" + a.name + "\" ließ sich nicht lesen — ungeprüft."); });
     })).then(function () {
-      fuellen(k, { name: name, art: "E-Mail mit " + anh.length + " Anhang/Anhängen", befunde: befunde, ungeprueft: ungeprueft, ungeprueftSatz: satz,
+      fuellen(k, { name: name, art: "E-Mail mit " + anh.length + " Anhang/Anhängen", befunde: befunde, texte: texte, ungeprueft: ungeprueft, ungeprueftSatz: satz,
         hinweise: hinweise.map(function (h) { return h.replace(/⚠ Kein Anhang wurde geöffnet\. Geprüft ist nur, was er zu sein behauptet/, "Die Anhänge wurden gelesen, nicht ausgeführt"); }) });
     });
   }

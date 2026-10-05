@@ -53,6 +53,8 @@ löscht Metadaten; ein PNG behält dabei die untersten Bits.
 
 ## Stufe 1 · Prioritätenliste je Betrieb
 
+> **Stand 2026-10-05: gebaut** (Gruppen, Stufen, Vorlagen, Eingang/Ausgang, Empfehlung). **Offen:** Absender-Vertrauen, „Mit KI vorschlagen“, Sicherung; dann Sende-Prüfer und Auslieferungsprüfer.
+
 - Häkchen: Firmengeheimnisse · Kontobewegungen/Bankdaten · Kundendaten ·
   Zugangsdaten · Verträge/Preise · eigene Punkte. Je Punkt streng/normal/aus.
 - Absender-Vertrauen mit eigenen Stufen, **nie** „gar nicht prüfen".
