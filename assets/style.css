@@ -99,3 +99,16 @@ span.tok{background:var(--akzent);color:var(--akzent-text);border-radius:3px;pad
 /* Silberner Rand auch am Logo in der Kopfleiste, damit es vor dunklem Grund absetzt */
 .brand img{border-radius:9px;box-shadow:0 0 0 1px rgb(0 0 0/.08),0 2px 6px rgb(0 0 0/.18)}
 @media (prefers-reduced-motion:reduce){.btn,.zeile{transform:none!important;transition:none}.btn::before{transition:none}}
+/* Installieren und ⟳ in der Kopfleiste (Klaus 2026-10-05: „Installationsbutton mit in die App") */
+.kopfknoepfe{margin-left:auto;display:flex;gap:6px;align-items:center}
+.kopfknoepfe .btn{min-height:36px;padding:5px 11px}
+#neuladen{width:36px;padding:0;font-size:1.15rem}
+#installieren[hidden]{display:none!important}
+#neuladen[data-laedt] span{display:inline-block;animation:inout-dreh .9s linear infinite}
+@keyframes inout-dreh{to{transform:rotate(360deg)}}
+@media (max-width:420px){#installieren .t{display:none}#installieren{width:36px;padding:0}}
+#install-meldung{position:fixed;right:12px;top:64px;z-index:60;max-width:min(420px,calc(100vw - 24px));background:var(--flaeche);
+  color:var(--text);border:1px solid var(--rand);border-radius:12px;padding:12px 14px;box-shadow:0 10px 30px rgb(0 0 0/.2);
+  font-size:.9rem;line-height:1.4;white-space:pre-line}
+#install-meldung>button{float:right;margin:-4px -4px 4px 8px;min-height:30px;padding:2px 9px}
+@media (prefers-reduced-motion:reduce){#neuladen[data-laedt] span{animation:none}}
