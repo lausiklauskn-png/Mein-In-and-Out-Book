@@ -53,6 +53,8 @@ textarea{width:100%;min-height:140px;font:14px/1.4 ui-monospace,Menlo,Consolas,m
 .wastun ol{margin:6px 0 0;padding-left:20px}
 .hinweise{margin-top:10px;font-size:.9rem;color:var(--leise)}
 .hinweise ul{margin:6px 0 0;padding-left:20px}
+.herkunft{margin:4px 0 6px}.herkunft summary{cursor:pointer;color:var(--text,inherit)}
+.herkunft dl{display:grid;grid-template-columns:minmax(0,max-content) minmax(0,1fr);gap:2px 10px;margin:6px 0 0}.herkunft dt{font-weight:600;overflow-wrap:anywhere}.herkunft dd{margin:0;overflow-wrap:anywhere}
 figure{margin:10px 0 0}
 figure img{max-width:100%;border-radius:8px;border:1px solid var(--rand)}
 footer{border-top:1px solid var(--rand);padding:16px 0 32px;font-size:.9rem}

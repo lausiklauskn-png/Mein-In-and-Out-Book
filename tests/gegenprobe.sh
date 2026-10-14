@@ -39,7 +39,7 @@ fall "EINGANG: eine Mailadresse gilt wieder als Befund" assets/eingang.js \
 fall "EINGANG: ungeprüft wird zu sauber" assets/eingang.js \
   ': info.ungeprueft ? "ungeprueft" : "sauber"' ': "sauber"' "unbekannte Binärdatei"
 fall "EINGANG: der Anhang trägt seine Stelle nicht mehr" assets/eingang.js \
-  'stelle: "Anhang " + a.name });' 'stelle: "" });' "Anhang wird gelesen"
+  'stelle: "Anhang " + a.name, daten:' 'stelle: "", daten:' "Anhang wird gelesen"
 fall "EINGANG: der Dateiname wird als HTML gesetzt" assets/eingang.js \
   'kopf.appendChild(el("b", "", name));' 'var bb = el("b"); bb.innerHTML = name; kopf.appendChild(bb);' "Markup bleibt Text|kein innerHTML"
 fall "EINGANG: kein „Was jetzt tun\" mehr" assets/eingang.js \
@@ -65,7 +65,7 @@ fall "INSTALL: als App bleibt der Knopf stehen" assets/installieren.js \
 fall "INSTALL: ⟳ räumt auch fremde Vorräte" assets/installieren.js \
   'var EIGEN = /^inout-/;' 'var EIGEN = /./;' "nur den eigenen Vorrat"
 fall "INSTALL: die Datei wird nicht geladen" index.html \
-  '<script src="assets/installieren.js?v=6"></script>' '' "installieren.js steht im Vorrat und wird geladen|Absturz"
+  '<script src="assets/installieren.js?v=7"></script>' '' "installieren.js steht im Vorrat und wird geladen|Absturz"
 fall "KANON: der Prüfkern wird hier abgewandelt" assets/pruefer-anhang.js \
   '/* Auslieferungsprüfer — Anhänge und einzelne Dateien' '/* Auslieferungsprüfer: Anhänge und einzelne Dateien' "Kanon byte-1:1: assets/pruefer-anhang.js"
 fall "RECHT: Platzhalter statt echter Angaben im Impressum" impressum.html \
@@ -104,16 +104,16 @@ fall "KANON: Modul 25 wird hier abgewandelt" modules/25_pseudonym.js \
 fall "KANON: die Anbieter-Liste wird hier abgewandelt" assets/anbieter.js \
   'claude-opus-5' 'claude-opus-4' "Kanon byte-1:1: assets/anbieter.js"
 fall "VORRAT: ausgang.js fehlt im Installations-Vorrat" sw.js \
-  '"assets/ausgang.js?v=6"' '"assets/ausgang-alt.js?v=6"' "Vorrat nennen assets/ausgang.js|liegt wirklich da"
+  '"assets/ausgang.js?v=7"' '"assets/ausgang-alt.js?v=7"' "Vorrat nennen assets/ausgang.js|liegt wirklich da"
 
 fall "GLAS: die Knöpfe werden wieder fett" assets/style.css \
   'min-height:36px;padding:5px 13px' 'min-height:46px;padding:12px 20px' "schlank"
 fall "GLAS: der Glanzpunkt fehlt" assets/style.css \
   'background:radial-gradient(90px 60px at var(--mx,50%) var(--my,20%),rgb(255 255 255/.55),transparent 60%),' 'background:' "Glanzpunkt"
 fall "GLAS: glas.js wird nicht geladen" index.html \
-  'src="assets/glas.js?v=6"' 'src="assets/glas-alt.js?v=6"' "glas.js steht im Vorrat|Wackeln"
+  'src="assets/glas.js?v=7"' 'src="assets/glas-alt.js?v=7"' "glas.js steht im Vorrat|Wackeln"
 fall "GLAS: glas.js fehlt im Vorrat" sw.js \
-  '"assets/glas.js?v=6"' '"assets/glas-alt.js?v=6"' "glas.js steht im Vorrat"
+  '"assets/glas.js?v=7"' '"assets/glas-alt.js?v=7"' "glas.js steht im Vorrat"
 fall "GLAS: der CSS-Riegel für weniger Bewegung ist weg" assets/style.css \
   '@media (prefers-reduced-motion:reduce){.btn,.zeile{transform:none!important;transition:none}' '@media (prefers-reduced-motion:reduce){.btn,.zeile{transition:none}' "weniger Bewegung"
 fall "GLAS: das Skript wackelt trotz weniger Bewegung" assets/glas.js \
@@ -123,10 +123,10 @@ fall "GLAS: im Dunkeln ist der Knopf wieder hell" assets/style.css \
 fall "GLAS: im Hellen ist der Knopf zu hell" assets/style.css \
   '--h1:#117a7a;' '--h1:#3cb4b4;' "lesbar \\(hell"
 fall "RAND: Manifest nennt eine andere Icon-Fassung" manifest.json \
-  'icons/icon-512.png?v=6' 'icons/icon-512.png?v=3' "Manifest|manifest"
+  'icons/icon-512.png?v=7' 'icons/icon-512.png?v=3' "Manifest|manifest"
 
 fall "BEGRIFF: ein Fachbegriff macht die Karte wieder rot" assets/eingang.js \
-  ', "KI-BEGRIFF": 1 };' ' };' 'Fachbegriff .* macht die Karte NICHT rot'
+  ', "KI-BEGRIFF": 1,' ',' 'Fachbegriff .* macht die Karte NICHT rot'
 fall "BEGRIFF: die Angabe sagt nicht mehr „keine Anweisung“" assets/eingang.js \
   '"KI-BEGRIFF":"Fachbegriff zu KI-Angriffen (keine Anweisung)",' '"KI-BEGRIFF":"Fachbegriff zu KI-Angriffen",' 'Angabe .*Fachbegriff'
 
@@ -147,11 +147,24 @@ fall "PRIO: im Eingang fehlt die Empfehlung" assets/eingang.js \
 fall "PRIO: der Schlüssel ist nicht mehr app-eigen" assets/eingang.js \
   'var PRIO_SCHLUESSEL = "inout_prioritaeten_v1";' 'var PRIO_SCHLUESSEL = "toolpoint_prioritaeten";' "app-eigen"
 fall "PRIO: prioritaeten.js fehlt im Vorrat" sw.js \
-  '"assets/prioritaeten.js?v=6"' '"assets/prioritaeten-alt.js?v=6"' "prioritaeten.js steht im Vorrat"
+  '"assets/prioritaeten.js?v=7"' '"assets/prioritaeten-alt.js?v=7"' "prioritaeten.js steht im Vorrat"
 fall "PRIO: im Ausgang hält ein strenges Wort nicht an" assets/ausgang.js \
   'if (streng.length) {' 'if (false) {' "strenges Wort hält"
 fall "PRIO: die Vorschau im Ausgang zeigt den Treffer nicht" assets/ausgang.js \
   'if (pt && pt.length) {' 'if (false) {' "Vorschau zeigt den Prioritäts"
+
+fall "HERKUNFT: ein Nachweis gilt wieder als Befund (Karte rot)" assets/eingang.js \
+  '"PDF-HERKUNFT": 1, "BILD-HERKUNFT": 1 };' '};' "Herkunft eule-c2pa"
+fall "HERKUNFT: die Einzelheiten fehlen (kein Details-Knopf)" assets/eingang.js \
+  'if (b.daten && b.daten.length) {' 'if (false) {' "Details anzeigen.* steht in den Angaben"
+fall "HERKUNFT: die Einzelheiten stehen gleich offen" assets/eingang.js \
+  'det.setAttribute("data-herkunft-details", "");' 'det.setAttribute("data-herkunft-details", ""); det.open = true;' "zuerst zu"
+fall "HERKUNFT: die daten gehen unterwegs verloren" assets/eingang.js \
+  'stelle: b.stelle || "", daten: b.daten || null };' 'stelle: b.stelle || "" };' "Details anzeigen.* steht in den Angaben"
+fall "HERKUNFT: der Prüfkern wird hier abgewandelt" assets/pruefer-formate.js \
+  '"Unterschrieben von"' '"Signiert von"' "Kanon byte-1:1: assets/pruefer-formate.js"
+fall "HERKUNFT: auch ohne Nachweis steht ein Details-Knopf" assets/eingang.js \
+  'if (angaben.length) {' 'var dd0 = el("details"); dd0.setAttribute("data-herkunft-details", ""); k.appendChild(dd0); if (angaben.length) {' "Gegenrichtung"
 
 echo "$n Fälle · $gefangen gefangen · $blind blind · $falsch aus falschem Grund · $tot tote Anker"
 rm -rf "$(dirname "$KOPIE")"

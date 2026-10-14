@@ -14,7 +14,8 @@
 (function () {
   "use strict";
   var GESCHEHEN = "schleuse-geteilt";      // Vorrat, in den sw.js geteilte Dateien legt
-  var ANGABEN = { "PERSONENBEZUG": 1, "RECHNUNGSDATEN": 1, "PDF-METADATEN": 1, "BILD-METADATEN": 1, "PDF-ALTFASSUNG": 1, "KI-BEGRIFF": 1 };
+  var ANGABEN = { "PERSONENBEZUG": 1, "RECHNUNGSDATEN": 1, "PDF-METADATEN": 1, "BILD-METADATEN": 1, "PDF-ALTFASSUNG": 1, "KI-BEGRIFF": 1,
+    "PDF-HERKUNFT": 1, "BILD-HERKUNFT": 1 };
   var KURZ = {"FREMDE-ADRESSE":"fremde Adresse","SCHLUESSEL":"Zugangsschlüssel","PERSONENBEZUG":"Angabe zu einer Person",
     "RECHNUNGSDATEN":"Abrechnungsdaten","PDF-VERWEIS":"Verweis nach außen","PDF-AKTION":"eingebettete Aktion","PDF-ANHANG":"Datei im PDF",
     "PDF-METADATEN":"Metadaten","PDF-ALTFASSUNG":"frühere Fassung","PDF-KI-ANWEISUNG":"Anweisung an eine KI","BILD-KI-ANWEISUNG":"Anweisung im Bild",
@@ -26,7 +27,7 @@
     "UNSICHTBARE-ZEICHEN":"unsichtbare Zeichen","KI-ANWEISUNG":"Anweisung an eine KI","KI-BEGRIFF":"Fachbegriff zu KI-Angriffen (keine Anweisung)",
     "BILD-METADATEN-KI-ANWEISUNG":"Anweisung in den Bild-Metadaten","ABSENDER-TARNUNG":"Absender passt nicht",
     "PRUEFUNG-DURCHGEFALLEN":"Echtheitsprüfung durchgefallen","KONTO-WECHSEL":"geänderte Bankverbindung","ZUGANGSDATEN":"fragt nach Zugangsdaten",
-    "DRUCK":"Frist und Drohung"};
+    "DRUCK":"Frist und Drohung","PDF-HERKUNFT":"Herkunftsnachweis","BILD-HERKUNFT":"Herkunftsnachweis"};
 
   var A = window.PrueferAnhang, M = window.PrueferMail, F = window.PrueferFormate, PRIO = window.Prioritaeten;
   var PRIO_SCHLUESSEL = "inout_prioritaeten_v1";
@@ -151,7 +152,23 @@
       d.setAttribute("data-angaben", String(angaben.length));
       d.appendChild(el("summary", "", angaben.length + " Angabe(n) zu Personen oder zur Datei — in eingehender Post normal"));
       var ul2 = el("ul");
-      angaben.forEach(function (b) { ul2.appendChild(el("li", "", (KURZ[b.kennung] || b.kennung) + ": " + b.satz + (b.stelle ? " (" + b.stelle + ")" : ""))); });
+      angaben.forEach(function (b) {
+        var li2 = el("li", "", (KURZ[b.kennung] || b.kennung) + ": " + b.satz + (b.stelle ? " (" + b.stelle + ")" : ""));
+        li2.setAttribute("data-kennung", b.kennung);
+        /* Herkunftsnachweis (C2PA, Klaus 2026-10-14): „kurz und verständlich …
+           genauere Ausgabe auf Knopfdruck". Die Einzelheiten stehen hinter
+           „Details anzeigen", zuerst zu. Fremder Text, nur als textContent. */
+        if (b.daten && b.daten.length) {
+          var det = el("details", "herkunft");
+          det.setAttribute("data-herkunft-details", "");
+          det.appendChild(el("summary", "", "Details anzeigen"));
+          var dl = el("dl");
+          b.daten.forEach(function (paar) { dl.appendChild(el("dt", "", String(paar[0]))); dl.appendChild(el("dd", "", String(paar[1]))); });
+          det.appendChild(dl);
+          li2.appendChild(det);
+        }
+        ul2.appendChild(li2);
+      });
       d.appendChild(ul2);
       k.appendChild(d);
     }
@@ -208,7 +225,7 @@
       return mailPruefen(new TextDecoder("utf-8").decode(bytes), name, k);
     }
     return A.pruefe(name, bytes).then(function (r) {
-      var befunde = r.befunde.map(function (b) { return { kennung: b.kennung, satz: b.satz, stelle: b.stelle || "" }; }).concat(textTreffer(r, name));
+      var befunde = r.befunde.map(function (b) { return { kennung: b.kennung, satz: b.satz, stelle: b.stelle || "", daten: b.daten || null }; }).concat(textTreffer(r, name));
       fuellen(k, { name: name, art: r.artName + " · " + A.gross(bytes.length), befunde: befunde, roheBefunde: r.befunde, texte: texteVon(r, ""),
         ungeprueft: !!r.bildUngeprueft, ungeprueftSatz: r.ungeprueftSatz, hinweise: (vorweg || []).concat(r.hinweise || []), bytes: bytes });
     }, function () {
@@ -231,7 +248,7 @@
     return Promise.all(anh.map(function (a) {
       if (a.zuGross) { hinweise.push("Anhang „" + a.name + "\" ist zu groß und wurde NICHT geöffnet — ungeprüft."); ungeprueft = true; return null; }
       return A.pruefe(a.name, a.bytes).then(function (x) {
-        x.befunde.forEach(function (b) { befunde.push({ kennung: b.kennung, satz: b.satz, stelle: "Anhang " + a.name }); });
+        x.befunde.forEach(function (b) { befunde.push({ kennung: b.kennung, satz: b.satz, stelle: "Anhang " + a.name, daten: b.daten || null }); });
         texte = texte.concat(texteVon(x, "Anhang " + a.name));
         textTreffer(x, a.name).forEach(function (t) { t.stelle = "Anhang " + a.name + (t.stelle ? ", " + t.stelle : ""); befunde.push(t); });
         if (x.bildUngeprueft) { ungeprueft = true; satz = satz || ("Anhang „" + a.name + "\": " + (x.ungeprueftSatz || "ungeprüft")); }

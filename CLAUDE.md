@@ -139,6 +139,27 @@ Schlüssel **`inout_prioritaeten_v1`** — app-eigen, ein fremder Wert wird nich
   später, je mit eigenem Schlüssel.
 - Proben: `smoke.mjs` (ohne Browser und im Browser) · Gegenprobe `NUR_FALL="PRIO:"` (11 Fälle). Cache v6, `?v=6`.
 
+## 🏷 Herkunftsnachweis (C2PA, Klaus 2026-10-14)
+
+Klaus: *„kurz und verständlich für Nutzer … genauere Ausgabe auf Knopfdruck."*
+`pruefer-formate.js` und `pruefer-anhang.js` sind neu byte-1:1 aus dem Auslieferungsprüfer kopiert
+(Pins in `KANON` nachgezogen). Sie melden **`PDF-HERKUNFT`** und **`BILD-HERKUNFT`** (JPEG APP11, PNG `caBX`,
+WebP), samt Feld `daten` (Programm, was gemacht wurde, woher der Inhalt stammt, Zeitpunkt, Unterzeichner …).
+
+- **Eine Angabe, kein Befund:** beide stehen in `ANGABEN` (`eingang.js`), die Karte wird nicht rot, es gibt
+  kein „Was jetzt tun". Im aufgeklappten Angaben-Bereich steht je Nachweis `<details data-herkunft-details>`
+  „Details anzeigen", **zuerst zu**, die Paare als `dl`, nur `textContent`. Auch an Mail-Anhängen.
+- ⚠ **Die Unterschrift wird NICHT geprüft** — das steht in den Einzelheiten selbst.
+- Ausgangstor und Prioritäten sind unberührt (sie lesen nur Befunde bzw. Texte).
+- Testdateien erfunden: `tests/anhang-muster.mjs` (byte-gleich aus dem Auslieferungsprüfer).
+- Proben: `smoke.mjs` § 7b (JPEG und PDF mit Nachweis, PDF ohne Nachweis) · Gegenprobe `NUR_FALL="HERKUNFT:"`
+  (6 Fälle). Cache v7, alle `?v=7`.
+- Gemessen 2026-10-14: `npm test` **158 grün · 0 ROT**, Rückgabe 0.
+  Gegenprobe `HERKUNFT:` in einer Kopie: erst **5 gefangen · 1 aus falschem Grund** (der Helfer der Probe las
+  `summary` ohne Prüfung und stürzte an einem leeren details ab), danach meldet er statt zu werfen: **6 gefangen · 0 blind ·
+  0 tote Anker**.
+- ⚠ Nicht gemessen: Tablet, echte C2PA-Dateien außer Klaus' PDF (die nur im Auslieferungsprüfer gelesen wurde).
+
 ## Was leicht kaputtgeht
 
 - **Cache-Bump:** wer eine Datei aus `CORE` in `sw.js` ändert, erhöht
