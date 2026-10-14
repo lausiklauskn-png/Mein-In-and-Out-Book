@@ -155,6 +155,9 @@ WebP), samt Feld `daten` (Programm, was gemacht wurde, woher der Inhalt stammt, 
 - Proben: `smoke.mjs` § 7b (JPEG und PDF mit Nachweis, PDF ohne Nachweis) · Gegenprobe `NUR_FALL="HERKUNFT:"`
   (6 Fälle). Cache v7, alle `?v=7`.
 - Gemessen 2026-10-14: `npm test` **158 grün · 0 ROT**, Rückgabe 0.
+  Gegenprobe `HERKUNFT:` in einer Kopie: erst **5 gefangen · 1 aus falschem Grund** (der Helfer der Probe las
+  `summary` ohne Prüfung und stürzte an einem leeren details ab), danach meldet er statt zu werfen: **6 gefangen · 0 blind ·
+  0 tote Anker**.
 - ⚠ Nicht gemessen: Tablet, echte C2PA-Dateien außer Klaus' PDF (die nur im Auslieferungsprüfer gelesen wurde).
 
 ## Was leicht kaputtgeht
