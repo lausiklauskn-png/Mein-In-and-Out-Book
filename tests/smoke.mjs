@@ -296,12 +296,12 @@ try {
     if (!k) return null;
     const d = k.querySelector("[data-herkunft-details]"), ang = k.querySelector("[data-angaben]");
     const r = { lage: k.getAttribute("data-lage"), details: k.querySelectorAll("[data-herkunft-details]").length,
-      zuerstZu: d ? !d.open : null, summary: d ? d.querySelector("summary").textContent : "",
-      kennung: d ? d.closest("li").getAttribute("data-kennung") : "", inAngaben: !!(d && ang && ang.contains(d)),
+      zuerstZu: d ? !d.open : null, summary: d && d.querySelector("summary") ? d.querySelector("summary").textContent : "",
+      kennung: d && d.closest("li") ? d.closest("li").getAttribute("data-kennung") : "", inAngaben: !!(d && ang && ang.contains(d)),
       wasTun: k.querySelectorAll("[data-was-tun]").length, rotHerkunft: k.querySelectorAll(".befunde [data-kennung$='HERKUNFT']").length };
     if (d) { if (ang) ang.open = true; d.open = true;
-      r.paare = [...d.querySelectorAll("dt")].map((x, i) => [x.textContent, d.querySelectorAll("dd")[i].textContent]);
-      r.sichtbar = d.querySelector("dd").checkVisibility(); }
+      r.paare = [...d.querySelectorAll("dt")].map((x, i) => [x.textContent, (d.querySelectorAll("dd")[i] || {}).textContent || ""]);
+      r.sichtbar = !!(d.querySelector("dd") && d.querySelector("dd").checkVisibility()); }
     return r;
   }, n);
   for (const [name, mime, buf, art] of [["eule-c2pa.jpg", "image/jpeg", jpegC2pa(), "BILD-HERKUNFT"], ["eule-c2pa.pdf", "application/pdf", pdfC2pa(), "PDF-HERKUNFT"]]) {
