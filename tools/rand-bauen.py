@@ -52,7 +52,8 @@ def bauen(groesse, name, alpha, rund=0.225):
         maske = q.getchannel("A").point(lambda v: 255 if v > 127 else 0)
     else:
         maske = form(n, rund)
-    breite = max(2 * SS, round(n * 0.04))
+    # mindestens 3 px im fertigen Bild: bei 2 px färbt ein heller Logo-Rand den Ring beim Verkleinern ein (gemessen 2026-10-15, favicon-32)
+    breite = max(3 * SS, round(n * 0.04))
     innen = schrumpfen(maske, breite)
     ring = ImageChops.subtract(maske, innen)
     linie = ImageChops.subtract(innen, schrumpfen(innen, max(1, SS // 2)))
