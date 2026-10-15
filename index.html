@@ -2,20 +2,34 @@
 <html lang="de">
 <head>
 <meta charset="utf-8">
+<!-- Schublade des SBKIM-Knotens: steht VOR jedem Skript, weil Modul 01 den Wert beim Laden liest. Nie ändern. -->
+<script>window.SBKIM_DB_SUFFIX = "inoutbook";</script>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Mein In-and-Out-Book</title>
 <meta name="description" content="Prüft auf deinem Gerät, was hereinkommt: Dateien, Bilder, PDFs und E-Mails auf versteckte Anweisungen an eine KI und andere Tarnungen. Nichts wird hochgeladen.">
 <meta name="theme-color" content="#0f6e6e">
 <link rel="manifest" href="manifest.json">
-<link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png?v=7">
-<link rel="icon" type="image/png" sizes="48x48" href="icons/favicon-48.png?v=7">
-<link rel="apple-touch-icon" href="icons/apple-touch-icon.png?v=7">
-<link rel="stylesheet" href="assets/style.css?v=7">
+<link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png?v=8">
+<link rel="icon" type="image/png" sizes="48x48" href="icons/favicon-48.png?v=8">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png?v=8">
+<link rel="stylesheet" href="assets/style.css?v=8">
 </head>
 <body>
 <header><div class="wrap bar">
-  <a class="brand" href="index.html"><img src="icons/marke-96.png?v=7" alt="" width="36" height="36">
+  <a class="brand" href="index.html"><img src="icons/marke-96.png?v=8" alt="" width="36" height="36">
     <span>Mein In-and-Out-Book<small>prüft, was hereinkommt und was hinausgeht</small></span></a>
+  <div class="netzleiste" id="netzleiste" data-offen="0">
+   <button class="lampen" id="lampen" type="button" aria-expanded="false" aria-controls="netz-mehr" title="SBKIM-Knoten: lebt · verkehr · fremd — tippen zeigt Siegel und Netz">
+    <span class="lamp" id="lamp-alive" title="lebt — eigene Identität geladen"><span class="lamp-t">lebt</span></span>
+    <span class="lamp" id="lamp-traffic" title="verkehr — grün, solange am Relais gelauscht wird"><span class="lamp-t">verkehr</span></span>
+    <span class="lamp" id="lamp-fremd" title="fremd — rot nur bei echtem Fremdzugriff"><span class="lamp-t">fremd</span></span>
+   </button>
+   <span class="netz-mehr" id="netz-mehr">
+    <span class="lampen-legende" aria-hidden="true"><span class="lamp" data-lampe-kopie="lamp-alive">lebt</span><span class="lamp" data-lampe-kopie="lamp-traffic">verkehr</span><span class="lamp" data-lampe-kopie="lamp-fremd">fremd</span></span>
+    <span class="siegel-platz" id="siegel-platz"></span>
+    <span class="mycel-platz" data-sbkim-mycel-platz></span>
+   </span>
+  </div>
 </div></header>
 
 <main class="wrap">
@@ -99,17 +113,20 @@
   <p class="leise">© 2026 Klaus Nitzsche · Der Prüfkern stammt aus dem Auslieferungsprüfer.</p>
 </div></footer>
 
-<script src="assets/pruefer.js?v=7"></script>
-<script src="assets/pruefer-formate.js?v=7"></script>
-<script src="assets/pruefer-mail.js?v=7"></script>
-<script src="assets/pruefer-anhang.js?v=7"></script>
-<script src="assets/prioritaeten.js?v=7"></script>
-<script src="assets/eingang.js?v=7"></script>
-<script src="modules/25_pseudonym.js?v=7"></script>
-<script src="assets/anbieter.js?v=7"></script>
-<script src="assets/ausgang.js?v=7"></script>
-<script src="assets/glas.js?v=7"></script>
-<script src="assets/installieren.js?v=7"></script>
+<script src="assets/pruefer.js?v=8"></script>
+<script src="assets/pruefer-formate.js?v=8"></script>
+<script src="assets/pruefer-mail.js?v=8"></script>
+<script src="assets/pruefer-anhang.js?v=8"></script>
+<script src="assets/prioritaeten.js?v=8"></script>
+<script src="assets/eingang.js?v=8"></script>
+<script src="modules/25_pseudonym.js?v=8"></script>
+<script src="assets/anbieter.js?v=8"></script>
+<script src="assets/ausgang.js?v=8"></script>
+<script src="assets/glas.js?v=8"></script>
+<script src="assets/installieren.js?v=8"></script>
+<!-- SBKIM-Knoten: 05b ist ein ES-Modul und steht NICHT in der Nachlade-Kette (holt noble-secp256k1.js selbst). -->
+<script type="module" src="modules/05b_nostr_relay.js?v=8"></script>
+<script src="assets/sbkim-init.js?v=8"></script>
 <script>
 if (window.Prioritaeten) Prioritaeten.baueEinstellungen(document.getElementById("prioEinst"), "inout_prioritaeten_v1");
 if ("serviceWorker" in navigator && location.protocol !== "file:") {

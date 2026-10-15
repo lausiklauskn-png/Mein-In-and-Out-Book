@@ -6,14 +6,18 @@
  * Teilen aus einer anderen App: der POST an ./teilen wird hier angenommen,
  * Dateien und Text kommen in den Vorrat GETEILT, dann geht es auf
  * index.html?geteilt=1. Die Seite liest ihn und LÖSCHT ihn danach. */
-var CACHE_VERSION = "inout-v7";
+var CACHE_VERSION = "inout-v8";
 var GETEILT = "schleuse-geteilt";
 var CORE = ["./", "index.html", "impressum.html", "datenschutz.html", "manifest.json",
-  "assets/style.css?v=7", "assets/pruefer.js?v=7", "assets/pruefer-formate.js?v=7", "assets/pruefer-mail.js?v=7",
-  "assets/pruefer-anhang.js?v=7", "assets/prioritaeten.js?v=7", "assets/eingang.js?v=7",
-  "modules/25_pseudonym.js?v=7", "assets/anbieter.js?v=7", "assets/ausgang.js?v=7",
-  "icons/favicon-32.png?v=7", "icons/favicon-48.png?v=7", "icons/apple-touch-icon.png?v=7",
-  "icons/icon-192.png?v=7", "icons/icon-512.png?v=7", "icons/maskable-512.png?v=7", "icons/marke-96.png?v=7", "assets/glas.js?v=7", "assets/installieren.js?v=7"];
+  "assets/style.css?v=8", "assets/pruefer.js?v=8", "assets/pruefer-formate.js?v=8", "assets/pruefer-mail.js?v=8",
+  "assets/pruefer-anhang.js?v=8", "assets/prioritaeten.js?v=8", "assets/eingang.js?v=8",
+  "modules/25_pseudonym.js?v=8", "assets/anbieter.js?v=8", "assets/ausgang.js?v=8",
+  "icons/favicon-32.png?v=8", "icons/favicon-48.png?v=8", "icons/apple-touch-icon.png?v=8",
+  "icons/icon-192.png?v=8", "icons/icon-512.png?v=8", "icons/maskable-512.png?v=8", "icons/marke-96.png?v=8", "assets/glas.js?v=8", "assets/installieren.js?v=8",
+  /* SBKIM-Knoten (Sage PFLICHT_MODULE, Falle 4): alles im Vorrat. noble ohne ?v= — 05b holt es per import ohne Zusatz. */
+  "assets/sbkim-init.js?v=8", "assets/siegel-inhalt.js?v=8", "modules/noble-secp256k1.js",
+  "modules/01_storage.js?v=8", "modules/02_spore.js?v=8", "modules/03_embedding.js?v=8", "modules/04_match.js?v=8", "modules/05_anastomose.js?v=8", "modules/05b_nostr_relay.js?v=8", "modules/07_apoptose.js?v=8", "modules/15_membran.js?v=8", "modules/16_siegel.js?v=8", "modules/16b_andock_wizard.js?v=8", "modules/23_rendezvous.js?v=8", "modules/23_rendezvous_ui.js?v=8",
+  "sicherheit.html"];
 
 self.addEventListener("install", function (e) {
   e.waitUntil(caches.open(CACHE_VERSION).then(function (c) {
