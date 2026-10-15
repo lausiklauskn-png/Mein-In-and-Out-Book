@@ -161,6 +161,69 @@ ok("prioritaeten.js steht im Vorrat und wird VOR eingang.js geladen", core.some(
 ok("der Speicher-Schlüssel ist app-eigen (inout_prioritaeten_v1) und steht gleich in Eingang, Ausgang und Seite",
   [eingang, lies("assets/ausgang.js"), seite].every((x) => x.includes('"inout_prioritaeten_v1"')));
 
+/* ══ KNOTEN: SBKIM-Knoten (Sammel-Brief 2026-10-15, Schritt 3) — ohne Browser ══
+   Die 13 Module sind byte-1:1 aus Sage-Protokol/src/modules/ (origin/main 4ad6e48),
+   dieselben Pins wie Workflow-Needs. Wer ein Modul neu kopiert, zieht hier den Pin nach. */
+const KNOTEN_PINS = {
+  "modules/01_storage.js": "5a5a4bf64dfcc107da7ed70fb755d7db5cce7d80e963b3e2fbc2004537747820",
+  "modules/02_spore.js": "0cbf0664e2a79f1301c03e52f7ac0030d4b2961f03b97b38e8634827a52353c5",
+  "modules/03_embedding.js": "a6ac64d7536da3fa5cc426d0f7db9440fdaf5ab4460f0bdc66a10eb8203b1b68",
+  "modules/04_match.js": "721eecc3c0d6ea4c259259e6071215ec1cd16f1c43c87b42ce9e72e9a0b5e41c",
+  "modules/05_anastomose.js": "255ac79aeb3b0203e92f0cebd0a905e47c488b43efe18f41332a7d35520bbf23",
+  "modules/05b_nostr_relay.js": "37eee5b196b3efad57131edd1cc3c0ee23acb97b5ca40740d6a0771db4b4a421",
+  "modules/07_apoptose.js": "0acdd6ab2d95e131fa6953061cc0e95a2396e05fff091a7dc690b2668a4c035a",
+  "modules/15_membran.js": "829a5bc01976b59c5ce428125314b87b314b6212cd5a473634c2d22c02579397",
+  "modules/16_siegel.js": "7c12bc487d445f7a284469eb860fcaec7bf93f84e146a00091cc93e5af210fec",
+  "modules/16b_andock_wizard.js": "c415eafdb1b660a5256e19957c667074b64b0c3990cc8acc4daeeef34a57e85d",
+  "modules/23_rendezvous.js": "05a6eb42ec687e74a8617f9941491a4f14bddda2257f84034eefbf3a106a624f",
+  "modules/23_rendezvous_ui.js": "efecd89ea80d8fa19c61c61a77b71a6d1b8cc8981c6ec1efd10ee92595a44f40",
+  "modules/noble-secp256k1.js": "8f3879ca422c4fdfe7ca0361688636fa7cc550a59bd94d512ed6ec79aa3d55d1"
+};
+{
+  const falsch = Object.keys(KNOTEN_PINS).filter((f) => !existsSync(join(WURZEL, f)) || sha(f) !== KNOTEN_PINS[f]);
+  ok("KNOTEN: die 13 Module sind byte-gleich mit Sage", falsch.length === 0, falsch.join(", "));
+  ok("KNOTEN: Modul 23 trägt Bau 23.R (RDV_LABEL_MAX = 200)", /var RDV_LABEL_MAX = 200;/.test(lies("modules/23_rendezvous.js")));
+  const kopf = seite.split("</head>")[0];
+  const suffixAt = kopf.search(/<script>\s*window\.SBKIM_DB_SUFFIX\s*=\s*"inoutbook"\s*;?\s*<\/script>/);
+  const erstesSkript = kopf.search(/<script(?![^>]*>\s*window\.SBKIM_DB_SUFFIX)/);
+  ok("KNOTEN: Schublade „inoutbook“ steht im <head> vor jedem anderen Skript", suffixAt >= 0 && (erstesSkript < 0 || suffixAt < erstesSkript), suffixAt + "/" + erstesSkript);
+  const glue = lies("assets/sbkim-init.js");
+  ok("KNOTEN: Klebstoff nutzt dieselbe Schublade", /dbSuffix:\s*"inoutbook"/.test(glue));
+  const kette = (glue.match(/var KANON = \[([\s\S]*?)\n\s*\];/) || [])[1] || "";
+  const glieder = kette.split("\n").map((z) => z.replace(/\/\/.*$/, "").trim()).filter((z) => z.startsWith("["));
+  const ohneKomma = glieder.slice(0, -1).filter((z) => !z.endsWith(","));
+  ok("KNOTEN: zwischen den Kettengliedern steht je ein Komma", glieder.length === 12 && ohneKomma.length === 0, glieder.length + " Glieder, ohne Komma: " + ohneKomma.join(" | "));
+  const namen = glieder.map((z) => (z.match(/"([^"]+\.js)"/) || [])[1]);
+  const pflicht = Object.keys(KNOTEN_PINS).filter((f) => !/noble|05b_/.test(f)).concat(["assets/siegel-inhalt.js"]);
+  ok("KNOTEN: die Kette lädt jedes Pflicht-Modul (ohne 05b) und die Identität", pflicht.every((f) => namen.includes(f)), pflicht.filter((f) => !namen.includes(f)).join(", "));
+  const vKette = (glue.match(/var V = "\?v=(\d+)";/) || [])[1];
+  ok("KNOTEN: die Kette lädt mit derselben ?v= wie Seite und Vorrat", vKette === vSeite[0] && core.includes("modules/01_storage.js?v=" + vKette), vKette);
+  ok("KNOTEN: 05b als ES-Modul mit eigener Zeile, NICHT in der Kette", /<script type="module" src="modules\/05b_nostr_relay\.js\?v=\d+"><\/script>/.test(seite) && !/05b_/.test(kette));
+  ok("KNOTEN: noble-secp256k1 steht NICHT in der klassischen Kette und nicht als <script> (ES-Modul)", !/noble/.test(kette) && !/<script[^>]*noble/.test(seite));
+  ok("KNOTEN: kein Modul 17 (feste Leiste in der Kopfzeile)", !/17_/.test(kette) && !/17_/.test(seite) && !existsSync(join(WURZEL, "modules/17_floating_widget.js")));
+  ok("KNOTEN: Modul 04 findet die Prüfliste — pruefer-mail.js lädt vor dem Klebstoff", seite.indexOf('src="assets/pruefer-mail.js') > 0 && seite.indexOf('src="assets/pruefer-mail.js') < seite.indexOf('src="assets/sbkim-init.js'));
+  ok("KNOTEN: die Identität steht vor dem Andock-Werkzeug", namen.indexOf("assets/siegel-inhalt.js") >= 0 && namen.indexOf("assets/siegel-inhalt.js") < namen.indexOf("modules/16b_andock_wizard.js"));
+  const fehltImVorrat = Object.keys(KNOTEN_PINS).concat(["assets/sbkim-init.js", "assets/siegel-inhalt.js", "sicherheit.html"])
+    .filter((f) => !core.some((u) => u.split("?")[0] === f));
+  ok("KNOTEN: jedes SBKIM-Modul, Klebstoff, Identität und sicherheit.html stehen im Installations-Vorrat", fehltImVorrat.length === 0, fehltImVorrat.join(", "));
+  ok("KNOTEN: noble steht ohne ?v= im Vorrat (05b holt es per import ohne Zusatz)", core.includes("modules/noble-secp256k1.js"));
+  ok("KNOTEN: Cache erhöht (inout-v8 oder später)", Number((sw.match(/CACHE_VERSION = "inout-v(\d+)"/) || [])[1]) >= 8);
+  ok("KNOTEN: keine fremde Herkunft (allowedOrigins leer)", /allowedOrigins:\s*\[\]/.test(glue));
+  ok("KNOTEN: Siegel-Band „IN-AND-OUT-BOOK“ im Badge-Platz der Kopfleiste", /ribbonText:\s*"IN-AND-OUT-BOOK"/.test(glue) && /badgeSelector:\s*"#siegel-platz"/.test(glue));
+  ok("KNOTEN: beim Start keine eigene Identität erzwungen (kein ensureIdentity)", !/ensureIdentity\s*\(/.test(glue.replace(/\/\*[\s\S]*?\*\//g, "")));
+  ok("KNOTEN: Gerätename über den Klebstoff ins Verbinden-Panel, nur als Text", /setAttribute\("data-sbkim-geraetename"/.test(glue) && /getElementById\("sbkim-rdv-panel"\)/.test(glue) && !/innerHTML/.test(glue));
+  const leiste = ['id="netzleiste"', 'id="lamp-alive"', 'id="lamp-traffic"', 'id="lamp-fremd"', 'id="siegel-platz"', "data-sbkim-mycel-platz"];
+  ok("KNOTEN: die Kopfleiste trägt Lampen, Siegel-Platz und Mycel-Platz", leiste.every((x) => seite.includes(x)), leiste.filter((x) => !seite.includes(x)).join(", "));
+  ok("KNOTEN: sicherheit.html liegt neben der Siegel-Seite (sonst 404 hinter „Ausführlich erklärt“)", existsSync(join(WURZEL, "sicherheit.html")) && /iframe\.src = "sicherheit\.html"/.test(lies("modules/16b_andock_wizard.js")));
+  const fenster = {}; new Function("window", lies("assets/siegel-inhalt.js"))(fenster);
+  const W = fenster.SBKIM_SIEGEL_WIZ || {};
+  const d = String(W.domainDescription || "");
+  ok("KNOTEN: Beschreibung beginnt mit dem eigenen Namen", d.startsWith("Mein In-and-Out-Book"));
+  ok("KNOTEN: Beschreibung nennt Zweck, SBKIM, Mycel, Sage-Protokol, Knoten", ["ZWECK", "SBKIM", "Mycel", "Sage-Protokol", "Knoten", "Eingangstor", "Ausgangstor"].every((w) => d.includes(w)));
+  ok("KNOTEN: Beschreibung trägt keine Mailadresse, keine Anschrift, keinen Betrag, keinen Platzhalter", !/@|\d{5}\s|Märchenweg|\d+\s*(€|EUR|Euro)|€\s*\d|⟦/.test(d));
+  ok("KNOTEN: Endpunkt ist die eigene Adresse", W.endpoint === "https://lausiklauskn-png.github.io/Mein-In-and-Out-Book/" && W.nodeName === "Mein In-and-Out-Book");
+}
+
 let pw;
 try { pw = await import("playwright-core"); } catch {
   console.log("⊘ nicht lauffähig: playwright-core fehlt (npm install). " + gruen + " grün · " + rot + " ROT ohne Browser.");
@@ -632,6 +695,67 @@ try {
     const hq = await hp.evaluate(() => [document.documentElement.scrollWidth - innerWidth, document.querySelector("#installieren").getBoundingClientRect().right <= innerWidth]);
     ok("am Handy (360 px) passt die Kopfleiste samt Knöpfen", hq[0] <= 0 && hq[1], String(hq));
     await hp.close();
+  }
+  /* ── KNOTEN: SBKIM-Knoten im Browser (Sammel-Brief 2026-10-15, Schritt 3) ──
+     Gewartet wird auf das ENDE der Nachlade-Kette (IO_KNOTEN_BEREIT), nicht nur auf ein
+     Modul — die Kette pausiert zwischen den Dateien. */
+  for (const breite of [1300, 380, 360, 320]) {
+    const kctx = await browser.newContext({ viewport: { width: breite, height: 800 } });
+    const kp = await kctx.newPage();
+    const ws = [], fremd = [], kfehler = [];
+    kp.on("websocket", (w) => ws.push(w.url()));
+    kp.on("pageerror", (e) => kfehler.push(String(e)));
+    /* Jede WebSocket-Erzeugung zählen, auch eine, die nie bis ins Netz kommt (ungültige Adresse). */
+    await kp.addInitScript(() => { const W = window.WebSocket; window.__wsZahl = 0;
+      window.WebSocket = function (...a) { window.__wsZahl++; return new W(...a); }; window.WebSocket.prototype = W.prototype; });
+    await kp.route("**/*", (r) => { const u = r.request().url(); if (u.startsWith(BASIS)) return r.continue(); fremd.push(u); return r.abort(); });
+    await kp.goto(BASIS + "index.html");
+    const bereit = await kp.waitForFunction(() => window.IO_KNOTEN_BEREIT === true, null, { timeout: 30000 }).then(() => true, () => false);
+    const da = await kp.evaluate(() => ["SbkimStorage", "SbkimSpore", "SbkimEmbedding", "SbkimMatch", "SbkimAnastomose", "SbkimNostrRelay", "SbkimApoptose", "SbkimMembrane",
+      "SbkimSiegel", "SbkimRendezvous", "SbkimRendezvousUI"].filter((g) => !window[g]));
+    ok(`KNOTEN ${breite}: die Kette lief durch, alle Pflicht-Module geladen (auch 05b als ES-Modul)`, bereit && da.length === 0, "fehlt: " + da.join(", "));
+    ok(`KNOTEN ${breite}: die Schublade ist sbkim_inoutbook`, await kp.evaluate(() => window.SBKIM_DB_SUFFIX === "inoutbook"));
+    const k = await kp.evaluate(() => {
+      const teile = [...document.querySelectorAll("header *")].filter((e) => e.getClientRects().length && e.checkVisibility());
+      return { quer: document.documentElement.scrollWidth - innerWidth, rechts: Math.max(...teile.map((e) => e.getBoundingClientRect().right)) - innerWidth,
+        lampen: ["lamp-alive", "lamp-traffic", "lamp-fremd"].every((id) => { const e = document.getElementById(id); return e && e.getBoundingClientRect().width > 0; }) };
+    });
+    ok(`KNOTEN ${breite}: die Kopfleiste läuft nicht über (nichts ragt rechts hinaus)`, k.quer <= 0 && k.rechts <= 0, JSON.stringify(k));
+    ok(`KNOTEN ${breite}: drei Lampen sichtbar`, k.lampen);
+    if (breite === 1300) {
+      const b = await kp.evaluate(() => { const e = document.getElementById("sbkim-siegel-badge"); if (!e) return null; const x = e.getBoundingClientRect(); return [x.width, x.height, !!e.closest("#siegel-platz")]; });
+      ok("KNOTEN 1300: Siegel-Abzeichen steht in der Kopfleiste (28×28)", b && b[0] === 28 && b[1] === 28 && b[2], String(b));
+      ok("KNOTEN 1300: das Siegel stellt sich aus (alle acht Siegel-Module da)", await kp.waitForFunction(() => window.SbkimSiegel && window.SbkimSiegel.isCertified(), null, { timeout: 10000 }).then(() => true, () => false));
+    } else {
+      await kp.click("#lampen");
+      const m = await kp.evaluate(() => { const e = document.getElementById("netz-mehr").getBoundingClientRect(); return { sichtbar: e.width > 0 && e.height > 0, links: e.left, rechts: e.right - innerWidth }; });
+      ok(`KNOTEN ${breite}: ein Tipp auf die Lampen klappt Siegel und Netz auf, ohne über den Rand`, m.sichtbar && m.links >= 0 && m.rechts <= 0, JSON.stringify(m));
+    }
+    const mk = kp.locator("[data-sbkim-mycel-platz] button").first();
+    ok(`KNOTEN ${breite}: Mycel-Knopf steht im Mycel-Platz`, await mk.count() === 1);
+    if (await mk.count()) await mk.click();
+    ok(`KNOTEN ${breite}: die Mycel-Blase trägt die Box „Netz“`, await kp.waitForSelector("[data-sbkim-netz-box]", { timeout: 5000 }).then(() => true, () => false));
+    ok(`KNOTEN ${breite}: Gerätename-Feld hängt im Verbinden-Panel`, await kp.locator("#sbkim-rdv-panel [data-sbkim-geraetename]").count() === 1);
+    const wsZahl = await kp.evaluate(() => window.__wsZahl);
+    ok(`KNOTEN ${breite}: Laden und Öffnen der Blase bauen keine Verbindung auf (kein WebSocket)`, ws.length === 0 && wsZahl === 0, wsZahl + " erzeugt · " + ws.join(", "));
+    ok(`KNOTEN ${breite}: beim Laden kein Abruf außer Haus`, fremd.length === 0, fremd.slice(0, 3).join(", "));
+    ok(`KNOTEN ${breite}: keine Seitenfehler (auch kein „Unexpected token export“)`, kfehler.length === 0, kfehler.slice(0, 2).join(" | "));
+    if (breite === 1300) {
+      await kp.keyboard.press("Escape");
+      await kp.locator("#sbkim-siegel-badge").click();
+      const wizKnopf = await kp.waitForFunction(() => { const e = document.getElementById("sbkim-si-open"); return !!e && e.checkVisibility(); }, null, { timeout: 8000 }).then(() => true, () => false);
+      ok("KNOTEN 1300: das Siegel öffnet sich mit dem Knopf zum Andock-Werkzeug", wizKnopf);
+      if (wizKnopf) await kp.locator("#sbkim-si-open").click();
+      ok("KNOTEN 1300: … und der Knopf öffnet den Andock-Wizard (eigene Identität und Spore)",
+        wizKnopf && await kp.waitForFunction(() => { const d = document.getElementById("sbkim-si-wizard"); return !!d && d.checkVisibility() && /Spore/.test(d.innerText); }, null, { timeout: 8000 }).then(() => true, () => false));
+      await kp.keyboard.press("Escape"); await kp.keyboard.press("Escape");
+      await kp.emulateMedia({ media: "print" });
+      const druckSicht = await kp.evaluate(() => ["netzleiste", "lampen", "sbkim-siegel-badge"].map((id) => { const e = document.getElementById(id); return e ? e.checkVisibility() : false; })
+        .concat([...document.querySelectorAll("[data-sbkim-mycel-platz] *, [data-sbkim-netz-box], #sbkim-rdv-panel")].map((e) => e.checkVisibility())));
+      ok("KNOTEN: beim Drucken ist keine Lampe, kein Siegel, keine Mycel-Blase zu sehen", druckSicht.every((x) => x === false), String(druckSicht));
+      await kp.emulateMedia({ media: "screen" });
+    }
+    await kctx.close();
   }
 } catch (e) {
   ok("die Probe läuft durch (Absturz: " + String(e && e.message || e).slice(0, 200) + ")", false);

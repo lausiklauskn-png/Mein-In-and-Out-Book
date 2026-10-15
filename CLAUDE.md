@@ -160,10 +160,41 @@ WebP), samt Feld `daten` (Programm, was gemacht wurde, woher der Inhalt stammt, 
   0 tote Anker**.
 - ⚠ Nicht gemessen: Tablet, echte C2PA-Dateien außer Klaus' PDF (die nur im Auslieferungsprüfer gelesen wurde).
 
+## 🍄 SBKIM-Knoten (Sammel-Brief 2026-10-15, Schritt 3)
+
+Das Buch ist ein eigener SBKIM-Knoten, Bauart Sende-Prüfer/Workflow-Needs: **feste Leiste in der Kopfzeile,
+kein Modul 17**. Lampen LEBT · VERKEHR · FREMD, Siegel (`#siegel-platz`, Band „IN-AND-OUT-BOOK“) mit dem
+Andock-Wizard, Mycel-Blase (`[data-sbkim-mycel-platz]`) mit der Box „Netz“. Bis 1100 px stehen nur die Lampen
+da; ein Tipp klappt Siegel und Mycel darunter auf.
+
+- **Schublade `inoutbook`** — `window.SBKIM_DB_SUFFIX` im `<head>` vor jedem Skript, Modul-01-DB
+  `sbkim_inoutbook`. **Nie ändern.** Getrennt von `InOutBook1` und den `inout_…`-Schlüsseln.
+- **13 Module byte-1:1 aus Sage** (`modules/01…23`, `16b`, `noble-secp256k1`), gepinnt in `tests/smoke.mjs`
+  (`KNOTEN_PINS`). Nie hier abwandeln — in Sage pflegen, mit `kanon-verteilen` neu kopieren.
+- **05b ist eine eigene `<script type="module">`-Zeile**, nicht in der Kette (`assets/sbkim-init.js`); es holt
+  `noble-secp256k1.js` selbst. noble steht deshalb **ohne** `?v=` im Vorrat.
+- Die Prüfliste für den KI-Richter (`assets/pruefer-mail.js`) lädt die Seite schon für den Prüfkern, vor der Kette.
+- **Alles im Installations-Vorrat** (Module, Klebstoff, Identität, `sicherheit.html`); die Kette lädt mit
+  derselben `?v=` wie Seite und Vorrat (`var V` in `sbkim-init.js` — beim Cache-Bump mitziehen).
+- **Beschreibung** (`assets/siegel-inhalt.js`): Zweck, Eingangs-/Ausgangstor, SBKIM — **nie** Postinhalt,
+  Adressen oder Namen aus geprüfter Post (die Probe sucht nach @, Anschrift, Betrag, ⟦).
+- **Beim Laden geht nichts ins Netz** (kein `ensureIdentity`; gemessen: keine WebSocket-Erzeugung, kein
+  Abruf außer Haus, auch nicht beim Öffnen von Siegel und Blase).
+- Gerätename hängt der Klebstoff ins Verbinden-Panel (`data-sbkim-geraetename`, nur als Text).
+- Die erste Spore entsteht am Gerät, im Siegel → Andock-Wizard. Im Depot liegt keine `sbkim/spore.json`.
+
+Gemessen 2026-10-15: `npm test` **231 grün · 0 ROT** (vorher 158) · Gegenprobe `KNOTEN:` **14 gefangen · 0 blind ·
+0 aus falschem Grund · 0 tote Anker**. Erst 3 blind: der Siegel-Wächter las Text, der auch im Verbinden-Panel steht
+(jetzt: `#sbkim-si-open` → `#sbkim-si-wizard`); der Netz-Wächter sah eine WebSocket auf eine ungültige Adresse nicht
+(jetzt zählt die Probe jede Erzeugung im Browser); der Klappfeld-Fall nahm eine Regel weg, die am Handy überschrieben
+wird (toter Eingriff, jetzt trifft er die tragende Regel). Cache v8, alle `?v=8`.
+⚠ Nicht gemessen: das Tablet, der Andock-Wizard bis zur signierten Spore, ein echter Beitritt zu einem Netz.
+⚠ `modules/25_pseudonym.js` ist eine ältere Fassung als Sages Kanon — benannt, nicht Teil dieses Schritts.
+
 ## Was leicht kaputtgeht
 
 - **Cache-Bump:** wer eine Datei aus `CORE` in `sw.js` ändert, erhöht
-  `CACHE_VERSION` (`inout-vN`) UND alle `?v=` in Seite und Vorrat.
+  `CACHE_VERSION` (`inout-vN`) UND alle `?v=` in Seite, Vorrat und `var V` in `assets/sbkim-init.js`.
 - `vendor/` (22 MB) gehört **nicht** in `CORE`; der Worker legt es beim ersten
   Gebrauch ab.
 - `impressum.html`/`datenschutz.html` tragen Klaus' **echte** Angaben (§ 5 DDG) —
