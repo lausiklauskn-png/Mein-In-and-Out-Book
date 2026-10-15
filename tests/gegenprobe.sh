@@ -3,6 +3,7 @@
 # Läuft in einer WEGWERF-KOPIE, nie im echten Baum.
 #   NUR_ANKER=1   nur prüfen, ob jeder Anker genau einmal trifft (Sekunden)
 #   NUR_FALL=...  nur Fälle, deren Name so beginnt
+# ⚠ Dieses Skript während eines Laufs NICHT bearbeiten: bash liest es zeilenweise nach (2026-10-15 so zerbrochen).
 set -u
 QUELLE="$(cd "$(dirname "$0")/.." && pwd)"
 KOPIE="$(mktemp -d)/kopie"
