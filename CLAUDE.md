@@ -75,6 +75,9 @@ Bediener-Tool."*
   `icons/quelle-512.png` (dem Icon OHNE Rand) mit silbernem, diagonal gespiegeltem Ring und einer
   dunklen Fuge. **Nie ein fertiges Icon als Quelle nehmen**, sonst wächst bei jedem Bauen ein Ring
   dazu. ⚠ `maskable-512.png` bleibt ohne Ring: der Launcher schneidet es selbst zu (Grenze).
+- **Neues Logo (Klaus 2026-10-15):** Schild und Paket mit Haken. Seine Datei hatte schwarze Ecken statt durchsichtiger;
+  freigestellt wurde nur das Dunkel, das mit einer Ecke zusammenhängt, dann als `icons/quelle-512.png` abgelegt und mit
+  `tools/rand-bauen.py` gebaut. `maskable-512.png` ist neu gesetzt: Logo auf 420 px im sicheren Kreis, Grund `#012524`.
 - **Knöpfe:** Glas aus dem Sende-Prüfer (Verlauf, innere Schatten, Glanzpunkt `::before` folgt
   `--mx/--my`), Wackeln aus family-project (`assets/glas.js`: bis 9° bei Knöpfen, 3° bei
   Listenzeilen). **Schlank:** 32–38 px hoch. Kontrast der Schrift ≥ 4,5 hell UND dunkel
