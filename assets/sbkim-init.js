@@ -91,7 +91,7 @@
   if (!window.SBKIM_MODEL_ROOT) window.SBKIM_MODEL_ROOT = "https://family-projekt.de/models/";
 
   /* ---- Die Kette, kanonische Reihenfolge (Sage docs/PFLICHT_MODULE.md) ---- */
-  var V = "?v=15";
+  var V = "?v=16";
   var KANON = [
     ["",       "modules/01_storage.js" + V],
     ["",       "modules/02_spore.js" + V],
