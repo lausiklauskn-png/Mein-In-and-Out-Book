@@ -128,6 +128,12 @@ scheiterten noch (nur die Erklärung, „lässt sich nicht installieren"), obwoh
 Chromium hier sie fehlerfrei als installierbar meldete; ein Eintrag in chrome://webapks gab es nicht. Wahrscheinlich hielt
 Chrome am Tablet noch das alte Manifest — gefolgert, nicht gemessen. Bei Hängen: ⟳ in der App, später erneut versuchen.
 
+### Kein „Websitedaten löschen“ mehr im Rat (2026-10-18)
+
+Der Erklärtext des Knopfs riet zuletzt, die Websitedaten zu löschen. Auf github.io teilen sich alle Apps einen Speicher —
+das nähme allen ihre Daten. Jetzt (wie Sage #1151): App unter Android-Einstellungen → Apps deinstallieren, Chrome schließen,
+neu laden, neu installieren. Cache v19, alle `?v=19`, Anker in `tests/gegenprobe.sh` mitgezogen (0 tot). ⚠ Am Tablet nicht gemessen.
+
 ## 📋 Plan: Abhakliste, Prioritäten, Bild-Metadaten (Klaus 2026-10-05)
 
 Entschieden, nicht gebaut: [`docs/BRIEF_2026-10-05_abhakliste.md`](docs/BRIEF_2026-10-05_abhakliste.md).

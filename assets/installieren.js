@@ -73,7 +73,7 @@
       "So wird es eine App: Symbol lange drücken → Entfernen bzw. Deinstallieren, diese Seite neu laden (⟳), " +
       "dann hier „Installieren“ tippen.\n\n" +
       "„App konnte nicht geöffnet werden“ kommt vom Gerät, nicht von dieser Seite. Hilft nichts: " +
-      "Chrome ⋮ → Einstellungen → Websiteeinstellungen → diese Seite → Daten löschen, dann neu installieren.");
+      "die App unter Android-Einstellungen → Apps deinstallieren, Chrome ganz schließen, diese Seite neu laden und noch einmal installieren. Bitte NICHT „Websitedaten löschen“: alle Apps unter dieser Adresse teilen sich einen Speicher, das löschte die Daten aller.");
   }
 
   async function neuLaden(k) {
