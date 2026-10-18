@@ -91,6 +91,31 @@ ok("⟳ räumt nur den eigenen Vorrat (inout-), nicht schleuse-geteilt", /var EI
 ok("Knöpfe nur über textContent, kein innerHTML", !/innerHTML|insertAdjacentHTML/.test(inst));
 ok("Manifest: id, start_url, scope, standalone, maskable-Icon", manifest.id && manifest.start_url && manifest.scope && manifest.display === "standalone" && manifest.icons.some((i) => i.purpose === "maskable"));
 
+/* Manifest-id wie Chrome sie rechnet (Klaus 2026-10-18, chrome://webapks): die id wird gegen den URSPRUNG
+   aufgelöst, nicht gegen den App-Ordner. "./" wird damit zu https://lausiklauskn-png.github.io/ — für JEDE
+   App auf dieser Adresse dieselbe id; Chrome hält dann verschiedene Apps für eine („bereits installiert",
+   „App konnte nicht geöffnet werden"). Die id muss deshalb im eigenen scope liegen. */
+{
+  const MANIFEST_URL = "https://lausiklauskn-png.github.io/Mein-In-and-Out-Book/manifest.json";
+  const chromeId = (id, start, manifestUrl) => {
+    const s = new URL(start, manifestUrl);
+    return new URL(id, s.origin).href.split("#")[0];
+  };
+  const imScope = (id, start, scope, manifestUrl) => {
+    const sc = new URL(scope, new URL(start, manifestUrl)).href;
+    return chromeId(id, start, manifestUrl).startsWith(sc);
+  };
+  ok("Manifest-id: die Rechnung selbst stimmt — \"./\" wird zum Ursprung, nicht zum App-Ordner",
+    chromeId("./", "./index.html", MANIFEST_URL) === "https://lausiklauskn-png.github.io/" &&
+    chromeId("/Mein-In-and-Out-Book/index.html", "./index.html", MANIFEST_URL) === "https://lausiklauskn-png.github.io/Mein-In-and-Out-Book/index.html" &&
+    !imScope("./", "./index.html", "./", MANIFEST_URL) && imScope("/Mein-In-and-Out-Book/", "./index.html", "./", MANIFEST_URL));
+  const meineId = chromeId(manifest.id, manifest.start_url, MANIFEST_URL);
+  ok("Manifest-id liegt im eigenen scope (sonst teilt sie die id mit jeder App auf github.io)",
+    imScope(manifest.id, manifest.start_url, manifest.scope, MANIFEST_URL), meineId);
+  ok("Manifest-id ist nicht die des Ursprungs (die teilen sich alle Apps auf dieser Adresse)",
+    meineId !== new URL(MANIFEST_URL).origin + "/", meineId);
+}
+
 const st = manifest.share_target || {};
 ok("Teilen-Ziel: POST multipart an ./teilen, mit Dateien", st.method === "POST" && st.enctype === "multipart/form-data" &&
   st.action === "./teilen" && Array.isArray(st.params && st.params.files) && st.params.files[0].name === "dateien");

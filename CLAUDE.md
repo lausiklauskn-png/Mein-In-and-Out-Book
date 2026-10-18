@@ -114,6 +114,15 @@ Gemessen 2026-10-05: `smoke.mjs` 111 grün · 0 ROT · Gegenprobe 44 gefangen ·
 Cache v4, `?v=4`. ⚠ Wer die `?v=` erhöht, zieht die Anker in `tests/gegenprobe.sh` mit (`NUR_ANKER=1` meldet sie).
 ⚠ Am Tablet nicht gemessen: ob die Installation über den Knopf jetzt zu einer echten App führt.
 
+### Manifest-id im eigenen Ordner (Klaus 2026-10-18, chrome://webapks)
+
+Chrome löst die `id` gegen den **Ursprung** auf, nicht gegen den App-Ordner: `"./"` wurde zu
+`https://lausiklauskn-png.github.io/` — dieselbe id wie zehn andere installierte Apps. Daher „bereits installiert" im
+Chrome-Menü und „App konnte nicht geöffnet werden". Jetzt `"id": "/Mein-In-and-Out-Book/index.html"` (= start_url).
+`smoke.mjs` rechnet die id wie Chrome und verlangt sie im eigenen scope; Gegenprobe `NUR_FALL="MANIFEST-ID:"`.
+Cache v18, alle `?v=18`; die neun seit v9 toten Anker in `tests/gegenprobe.sh` sind mitgezogen.
+⚠ Eine schon installierte Fassung einmal deinstallieren und neu installieren (Chrome behält die alte id). Am Tablet nicht gemessen.
+
 ## 📋 Plan: Abhakliste, Prioritäten, Bild-Metadaten (Klaus 2026-10-05)
 
 Entschieden, nicht gebaut: [`docs/BRIEF_2026-10-05_abhakliste.md`](docs/BRIEF_2026-10-05_abhakliste.md).
