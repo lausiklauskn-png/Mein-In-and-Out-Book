@@ -245,3 +245,12 @@ bevor die markierte Kopie gezeichnet war. Sie wartet jetzt auf das Bild selbst.
 
 Freibrief · frisch von `origin/main` · Ton · kein PII · Ehrlichkeit:
 [Sage-Protokol/docs/NETZWEIT.md](https://github.com/lausiklauskn-png/Sage-Protokol/blob/main/docs/NETZWEIT.md)
+
+## ⬇ Installieren auch hinten in den Einstellungen (Klaus 2026-10-18)
+
+Klaus: *„Installieren-Button unter Einstellungen hinten, wie bei meinem Rezeptbuch … sobald installiert, verschwindet er.“*
+`#installieren-einstellungen` („⬇ Als App installieren“) steht als letztes Element im Reiter **⚑ Prioritäten**
+(`data-tor-teil="einstellungen"`), `data-install-knopf`, `data-ort="einstellungen"` (Mechanik wie Sage-Protokol #1153), dieselbe
+Klick-Logik wie oben; als App beide weg. Die Meldung war schon lesbar (`--flaeche`/`--text` aus `style.css`, gemessen dunkel 13,94 ·
+hell 16,48) — keine Kontrast-Sicherung nötig. Gemessen im Browser: letztes Element, sichtbar, Meldung obenauf; als App versteckt.
+Cache v20, alle `?v=20` (samt `var V` und den Ankern in `tests/gegenprobe.sh`). ⚠ Am Tablet nicht gemessen.

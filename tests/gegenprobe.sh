@@ -66,7 +66,7 @@ fall "INSTALL: als App bleibt der Knopf stehen" assets/installieren.js \
 fall "INSTALL: ⟳ räumt auch fremde Vorräte" assets/installieren.js \
   'var EIGEN = /^inout-/;' 'var EIGEN = /./;' "nur den eigenen Vorrat"
 fall "INSTALL: die Datei wird nicht geladen" index.html \
-  '<script src="assets/installieren.js?v=19"></script>' '' "installieren.js steht im Vorrat und wird geladen|Absturz"
+  '<script src="assets/installieren.js?v=20"></script>' '' "installieren.js steht im Vorrat und wird geladen|Absturz"
 fall "KANON: der Prüfkern wird hier abgewandelt" assets/pruefer-anhang.js \
   '/* Auslieferungsprüfer — Anhänge und einzelne Dateien' '/* Auslieferungsprüfer: Anhänge und einzelne Dateien' "Kanon byte-1:1: assets/pruefer-anhang.js"
 fall "RECHT: Platzhalter statt echter Angaben im Impressum" impressum.html \
@@ -105,16 +105,16 @@ fall "KANON: Modul 25 wird hier abgewandelt" modules/25_pseudonym.js \
 fall "KANON: die Anbieter-Liste wird hier abgewandelt" assets/anbieter.js \
   'claude-opus-5' 'claude-opus-4' "Kanon byte-1:1: assets/anbieter.js"
 fall "VORRAT: ausgang.js fehlt im Installations-Vorrat" sw.js \
-  '"assets/ausgang.js?v=19"' '"assets/ausgang-alt.js?v=19"' "Vorrat nennen assets/ausgang.js|liegt wirklich da"
+  '"assets/ausgang.js?v=20"' '"assets/ausgang-alt.js?v=20"' "Vorrat nennen assets/ausgang.js|liegt wirklich da"
 
 fall "GLAS: die Knöpfe werden wieder fett" assets/style.css \
   'min-height:36px;padding:5px 13px' 'min-height:46px;padding:12px 20px' "schlank"
 fall "GLAS: der Glanzpunkt fehlt" assets/style.css \
   'background:radial-gradient(90px 60px at var(--mx,50%) var(--my,20%),rgb(255 255 255/.55),transparent 60%),' 'background:' "Glanzpunkt"
 fall "GLAS: glas.js wird nicht geladen" index.html \
-  'src="assets/glas.js?v=19"' 'src="assets/glas-alt.js?v=19"' "glas.js steht im Vorrat|Wackeln"
+  'src="assets/glas.js?v=20"' 'src="assets/glas-alt.js?v=20"' "glas.js steht im Vorrat|Wackeln"
 fall "GLAS: glas.js fehlt im Vorrat" sw.js \
-  '"assets/glas.js?v=19"' '"assets/glas-alt.js?v=19"' "glas.js steht im Vorrat"
+  '"assets/glas.js?v=20"' '"assets/glas-alt.js?v=20"' "glas.js steht im Vorrat"
 fall "GLAS: der CSS-Riegel für weniger Bewegung ist weg" assets/style.css \
   '@media (prefers-reduced-motion:reduce){.btn,.zeile{transform:none!important;transition:none}' '@media (prefers-reduced-motion:reduce){.btn,.zeile{transition:none}' "weniger Bewegung"
 fall "GLAS: das Skript wackelt trotz weniger Bewegung" assets/glas.js \
@@ -124,7 +124,7 @@ fall "GLAS: im Dunkeln ist der Knopf wieder hell" assets/style.css \
 fall "GLAS: im Hellen ist der Knopf zu hell" assets/style.css \
   '--h1:#117a7a;' '--h1:#3cb4b4;' "lesbar \\(hell"
 fall "RAND: Manifest nennt eine andere Icon-Fassung" manifest.json \
-  'icons/icon-512.png?v=19' 'icons/icon-512.png?v=3' "Manifest|manifest"
+  'icons/icon-512.png?v=20' 'icons/icon-512.png?v=3' "Manifest|manifest"
 fall "MANIFEST-ID: die id ist wieder \"./\" (= Ursprung, für alle Apps auf github.io dieselbe)" manifest.json \
   '"id": "/Mein-In-and-Out-Book/index.html",' '"id": "./",' "Manifest-id liegt im eigenen scope"
 
@@ -150,7 +150,7 @@ fall "PRIO: im Eingang fehlt die Empfehlung" assets/eingang.js \
 fall "PRIO: der Schlüssel ist nicht mehr app-eigen" assets/eingang.js \
   'var PRIO_SCHLUESSEL = "inout_prioritaeten_v1";' 'var PRIO_SCHLUESSEL = "toolpoint_prioritaeten";' "app-eigen"
 fall "PRIO: prioritaeten.js fehlt im Vorrat" sw.js \
-  '"assets/prioritaeten.js?v=19"' '"assets/prioritaeten-alt.js?v=19"' "prioritaeten.js steht im Vorrat"
+  '"assets/prioritaeten.js?v=20"' '"assets/prioritaeten-alt.js?v=20"' "prioritaeten.js steht im Vorrat"
 fall "PRIO: im Ausgang hält ein strenges Wort nicht an" assets/ausgang.js \
   'if (streng.length) {' 'if (false) {' "strenges Wort hält"
 fall "PRIO: die Vorschau im Ausgang zeigt den Treffer nicht" assets/ausgang.js \
@@ -179,11 +179,11 @@ fall "KNOTEN: Pflicht-Modul 15 fehlt in der Kette" assets/sbkim-init.js \
 fall "KNOTEN: die Identität fehlt in der Kette" assets/sbkim-init.js \
   '    ["",       "assets/siegel-inhalt.js" + V],        // die Identität dieses Knotens' '' "lädt jedes Pflicht-Modul \(ohne 05b\) und die Identität"
 fall "KNOTEN: die 05b-Zeile fehlt" index.html \
-  '<script type="module" src="modules/05b_nostr_relay.js?v=19"></script>' '' "05b als ES-Modul|alle Pflicht-Module geladen"
+  '<script type="module" src="modules/05b_nostr_relay.js?v=20"></script>' '' "05b als ES-Modul|alle Pflicht-Module geladen"
 fall "KNOTEN: noble als klassisches Skript" index.html \
-  '<script src="assets/sbkim-init.js?v=19"></script>' '<script src="modules/noble-secp256k1.js"></script><script src="assets/sbkim-init.js?v=19"></script>' "noble-secp256k1 steht NICHT|Seitenfehler"
+  '<script src="assets/sbkim-init.js?v=20"></script>' '<script src="modules/noble-secp256k1.js"></script><script src="assets/sbkim-init.js?v=20"></script>' "noble-secp256k1 steht NICHT|Seitenfehler"
 fall "KNOTEN: Modul 23 fehlt im Installations-Vorrat" sw.js \
-  '"modules/23_rendezvous.js?v=19", ' '' "stehen im Installations-Vorrat"
+  '"modules/23_rendezvous.js?v=20", ' '' "stehen im Installations-Vorrat"
 fall "KNOTEN: fremde Herkunft erlaubt" assets/sbkim-init.js \
   'allowedOrigins: []' 'allowedOrigins: ["https://fremd.example"]' "keine fremde Herkunft"
 fall "KNOTEN: Mailadresse in der Beschreibung" assets/siegel-inhalt.js \
