@@ -6,17 +6,17 @@
  * Teilen aus einer anderen App: der POST an ./teilen wird hier angenommen,
  * Dateien und Text kommen in den Vorrat GETEILT, dann geht es auf
  * index.html?geteilt=1. Die Seite liest ihn und LÖSCHT ihn danach. */
-var CACHE_VERSION = "inout-v17";
+var CACHE_VERSION = "inout-v18";
 var GETEILT = "schleuse-geteilt";
 var CORE = ["./", "index.html", "impressum.html", "datenschutz.html", "manifest.json",
-  "assets/style.css?v=17", "assets/pruefer.js?v=17", "assets/pruefer-formate.js?v=17", "assets/pruefer-mail.js?v=17",
-  "assets/pruefer-anhang.js?v=17", "assets/prioritaeten.js?v=17", "assets/eingang.js?v=17",
-  "modules/25_pseudonym.js?v=17", "assets/anbieter.js?v=17", "assets/ausgang.js?v=17",
-  "icons/favicon-32.png?v=17", "icons/favicon-48.png?v=17", "icons/apple-touch-icon.png?v=17",
-  "icons/icon-192.png?v=17", "icons/icon-512.png?v=17", "icons/maskable-512.png?v=17", "icons/marke-96.png?v=17", "assets/glas.js?v=17", "assets/installieren.js?v=17",
+  "assets/style.css?v=18", "assets/pruefer.js?v=18", "assets/pruefer-formate.js?v=18", "assets/pruefer-mail.js?v=18",
+  "assets/pruefer-anhang.js?v=18", "assets/prioritaeten.js?v=18", "assets/eingang.js?v=18",
+  "modules/25_pseudonym.js?v=18", "assets/anbieter.js?v=18", "assets/ausgang.js?v=18",
+  "icons/favicon-32.png?v=18", "icons/favicon-48.png?v=18", "icons/apple-touch-icon.png?v=18",
+  "icons/icon-192.png?v=18", "icons/icon-512.png?v=18", "icons/maskable-512.png?v=18", "icons/marke-96.png?v=18", "assets/glas.js?v=18", "assets/installieren.js?v=18",
   /* SBKIM-Knoten (Sage PFLICHT_MODULE, Falle 4): alles im Vorrat. noble ohne ?v= — 05b holt es per import ohne Zusatz. */
-  "assets/sbkim-init.js?v=17", "assets/siegel-inhalt.js?v=17", "modules/noble-secp256k1.js",
-  "modules/01_storage.js?v=17", "modules/02_spore.js?v=17", "modules/03_embedding.js?v=17", "modules/04_match.js?v=17", "modules/05_anastomose.js?v=17", "modules/05b_nostr_relay.js?v=17", "modules/07_apoptose.js?v=17", "modules/15_membran.js?v=17", "modules/16_siegel.js?v=17", "modules/16b_andock_wizard.js?v=17", "modules/23_rendezvous.js?v=17", "modules/23_rendezvous_ui.js?v=17",
+  "assets/sbkim-init.js?v=18", "assets/siegel-inhalt.js?v=18", "modules/noble-secp256k1.js",
+  "modules/01_storage.js?v=18", "modules/02_spore.js?v=18", "modules/03_embedding.js?v=18", "modules/04_match.js?v=18", "modules/05_anastomose.js?v=18", "modules/05b_nostr_relay.js?v=18", "modules/07_apoptose.js?v=18", "modules/15_membran.js?v=18", "modules/16_siegel.js?v=18", "modules/16b_andock_wizard.js?v=18", "modules/23_rendezvous.js?v=18", "modules/23_rendezvous_ui.js?v=18",
   "sicherheit.html"];
 
 self.addEventListener("install", function (e) {
