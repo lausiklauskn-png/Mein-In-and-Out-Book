@@ -45,10 +45,12 @@
   }
 
   function knopfZeichnen() {
-    var k = document.getElementById("installieren");
-    if (!k) return;
+    var alle = document.querySelectorAll("[data-install-knopf]");
+    for (var i = 0; i < alle.length; i++) zeichneEinen(alle[i]);
+  }
+  function zeichneEinen(k) {
     var app = alsApp();
-    k.hidden = app;
+    k.hidden = app; k.style.display = app ? "none" : "";
     k.dataset.lage = app ? "app" : (ereignis ? "angeboten" : "nicht-angeboten");
     k.title = ereignis ? "Als App installieren" :
       "Installieren — der Browser bietet es gerade nicht an, ein Tipp sagt warum";
@@ -110,13 +112,31 @@
     return k;
   }
 
+  /* Zweiter Knopf HINTEN in den Einstellungen („⚑ Prioritäten“, data-tor-teil="einstellungen")
+     — Klaus 2026-10-18: „Installieren-Button unter Einstellungen hinten, wie bei meinem
+     Rezeptbuch … sobald installiert, verschwindet er“. Mechanik wie Sage-Protokol #1153
+     (data-install-knopf, data-ort); dieselbe Klick-Logik wie oben. */
+  function einstellungenEinhaengen() {
+    var b = document.querySelector('[data-tor-teil="einstellungen"]');
+    if (!b || b.querySelector("[data-install-knopf]")) return;
+    var k = document.createElement("button");
+    k.type = "button"; k.className = "btn leicht"; k.id = "installieren-einstellungen";
+    k.setAttribute("data-install-knopf", ""); k.setAttribute("data-ort", "einstellungen");
+    k.textContent = "⬇ Als App installieren";
+    k.addEventListener("click", klick);
+    b.appendChild(k);
+    zeichneEinen(k);
+  }
+
   function einhaengen() {
     adresseAufraeumen();
+    einstellungenEinhaengen();
     var bar = document.querySelector("header .bar");
     if (!bar || document.getElementById("installieren")) return;
     var gruppe = document.createElement("div");
     gruppe.className = "kopfknoepfe";
     var inst = rund("installieren", "⬇", "Als App installieren", klick);
+    inst.setAttribute("data-install-knopf", "");
     var t = document.createElement("span"); t.className = "t"; t.textContent = " Installieren";
     inst.appendChild(t);
     var nl = rund("neuladen", "⟳", "Neue Version laden (Vorrat leeren und neu laden)", function () { neuLaden(nl); });
