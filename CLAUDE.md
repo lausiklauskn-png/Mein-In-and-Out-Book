@@ -121,7 +121,12 @@ Chrome löst die `id` gegen den **Ursprung** auf, nicht gegen den App-Ordner: `"
 Chrome-Menü und „App konnte nicht geöffnet werden". Jetzt `"id": "/Mein-In-and-Out-Book/index.html"` (= start_url).
 `smoke.mjs` rechnet die id wie Chrome und verlangt sie im eigenen scope; Gegenprobe `NUR_FALL="MANIFEST-ID:"`.
 Cache v18, alle `?v=18`; die neun seit v9 toten Anker in `tests/gegenprobe.sh` sind mitgezogen.
-⚠ Eine schon installierte Fassung einmal deinstallieren und neu installieren (Chrome behält die alte id). Am Tablet nicht gemessen.
+⚠ Eine schon installierte Fassung einmal deinstallieren und neu installieren (Chrome behält die alte id).
+✅ **Am Tablet bestätigt (Klaus 2026-10-18, abends):** Installieren klappt — Chrome bot es an, der Knopf öffnete Chromes
+Dialog statt der Erklärung. Hier stand: *„Am Tablet nicht gemessen."* ⚠ Die ersten Versuche Stunden nach dem Merge
+scheiterten noch (nur die Erklärung, „lässt sich nicht installieren"), obwohl die neue Fassung seit 16:04 live war und
+Chromium hier sie fehlerfrei als installierbar meldete; ein Eintrag in chrome://webapks gab es nicht. Wahrscheinlich hielt
+Chrome am Tablet noch das alte Manifest — gefolgert, nicht gemessen. Bei Hängen: ⟳ in der App, später erneut versuchen.
 
 ## 📋 Plan: Abhakliste, Prioritäten, Bild-Metadaten (Klaus 2026-10-05)
 
